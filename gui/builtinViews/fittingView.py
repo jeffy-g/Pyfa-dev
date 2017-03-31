@@ -306,7 +306,7 @@ class FittingView(d.Display):
 
     def updateTab(self):
         sFit = Fit.getInstance()
-        fit = sFit.getFit(self.getActiveFit(), basic=True)
+        fit = sFit.getFit(self.getActiveFit(), False, True)
 
         bitmap = BitmapLoader.getImage("race_%s_small" % fit.ship.item.race, "gui")
         text = "%s: %s" % (fit.ship.item.name, fit.name)
