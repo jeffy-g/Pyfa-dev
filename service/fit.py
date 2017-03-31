@@ -1100,7 +1100,8 @@ class Fit(object):
             fit.factorReload = self.serviceFittingOptions["useGlobalForceReload"]
         fit.clear()
 
-        fit.calculateModifiedAttributes(withBoosters=False)
+        # Disabled in 08be50c. Not sure why?
+        fit.calculateModifiedAttributes(withBoosters=withBoosters)
 
         if fit not in self.cached_fits:
             self.cached_fits.append(fit)
