@@ -219,8 +219,6 @@ class Fit(object):
         if basic:
             return fit
 
-
-
             fit.inited = True
 
         if fit:

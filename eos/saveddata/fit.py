@@ -702,12 +702,10 @@ class Fit(object):
             pyfalog.debug("All fits in chain have already been calculated.  Skipping recalcs.")
             print("All fits in chain have already been calculated.  Skipping recalcs.")
 
-
         self.calculateModifiedFitAttributes()
 
         if targetFit:
             self.calculateModifiedFitAttributes(targetFit=targetFit)
-
 
     def calculateModifiedFitAttributes(self, targetFit=None):
         """
