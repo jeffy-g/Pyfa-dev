@@ -200,7 +200,8 @@ class Fit(object):
             if fit.damagePattern != self.pattern:
                 fit.damagePattern = self.pattern
 
-        self.recalc(fit)
+        if not fit.calculated:
+            self.recalc(fit)
 
     def getFit(self, fitID, basic=False):
         """
@@ -1051,6 +1052,7 @@ class Fit(object):
         pyfalog.info("=" * 10 + "recalc: {0}" + "=" * 10, fit.name)
 
         # Commit any changes before we recalc
+        fit.clear()
         eos.db.commit()
 
         if fit.factorReload is not self.serviceFittingOptions["useGlobalForceReload"]:
