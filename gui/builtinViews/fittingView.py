@@ -274,7 +274,7 @@ class FittingView(d.Display):
         try:
             # Sometimes there is no active page after deletion, hence the try block
             sFit = Fit.getInstance()
-            sFit.refreshFit(self.getActiveFit())
+            sFit.recalc(sFit.getFit(self.getActiveFit()))
             wx.PostEvent(self.mainFrame, GE.FitChanged(fitID=self.activeFitID))
         except wx._core.PyDeadObjectError:
             pyfalog.error("Caught dead object")

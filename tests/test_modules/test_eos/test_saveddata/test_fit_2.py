@@ -118,9 +118,6 @@ def test_calculateModifiedAttributes_withBooster(DB, RifterFit, HeronFit):
     max_target_range_5 = RifterFit.ship.getModifiedItemAttr('maxTargetRange')
     scan_resolution_5 = RifterFit.ship.getModifiedItemAttr('scanResolution')
 
-
     for test_dict in rifter_modifier_dicts:
         assert len(getattr(RifterFit.ship.itemModifiedAttributes, test_dict)) == rifter_modifier_dicts[test_dict]
-
-    test = True
 

@@ -186,9 +186,9 @@ class Fit(object):
         return self.__calculated
 
     @calculated.setter
-    def calculated(self, bool):
+    def calculated(self, value):
         # todo: brief explaination hwo this works
-        self.__calculated = bool
+        self.__calculated = value
 
     @property
     def ship(self):
@@ -646,31 +646,61 @@ class Fit(object):
 
             del self.commandBonuses[warfareBuffID]
 
+    def validateFitCalculated(self):
+        """
+        Walks up the chain for the fit and anything projected or command fits haven't been calculated
+
+        :return:
+        True if all fits are calculated, False if one (or more) is not
+        """
+
+        if self.calculated is False:
+            return False
+
+        for projected_fit in self.projectedFits:
+            if projected_fit.getProjectionInfo(self.ID).active:
+                if projected_fit is not self:
+                    projected_calculated = projected_fit.validateFitCalculated()
+
+                    if projected_calculated is False:
+                        return False
+
+        for command_fit in self.commandFits:
+            if command_fit.getCommandInfo(self.ID).active:
+                if command_fit is not self:
+                    command_calculated = command_fit.validateFitCalculated()
+
+                    if command_calculated is False:
+                        return False
+
+        return True
+
     def calculateFitAttributes(self, targetFit=None, withBoosters=False):
         pyfalog.debug("Starting fit calculation.")
 
-        if withBoosters:
-            # Recalc ships projecting onto this fit
-            for projected_fit in self.projectedFits:
-                if projected_fit.getProjectionInfo(self.ID).active:
-                    if projected_fit is self:
-                        # If fit is self, don't recurse
-                        self.calculateModifiedFitAttributes(targetFit=self)
-                    else:
-                        projected_fit.calculateModifiedFitAttributes(targetFit=self)
+        if not self.validateFitCalculated():
+            if withBoosters:
+                # Recalc ships projecting onto this fit
+                for projected_fit in self.projectedFits:
+                    if projected_fit.getProjectionInfo(self.ID).active:
+                        if projected_fit is self:
+                            # If fit is self, don't recurse
+                            self.calculateModifiedFitAttributes(targetFit=self)
+                        else:
+                            projected_fit.calculateModifiedFitAttributes(targetFit=self)
 
-            for command_fit in self.commandFits:
-                if command_fit.getCommandInfo(self.ID).active:
-                    if command_fit is self:
-                        # If fit is self, don't recurse
-                        self.calculateModifiedFitAttributes(targetFit=self)
-                    else:
-                        command_fit.calculateModifiedFitAttributes(targetFit=self)
+                for command_fit in self.commandFits:
+                    if command_fit.getCommandInfo(self.ID).active:
+                        if command_fit is self:
+                            # If fit is self, don't recurse
+                            self.calculateModifiedFitAttributes(targetFit=self)
+                        else:
+                            command_fit.calculateModifiedFitAttributes(targetFit=self)
 
-        self.calculateModifiedFitAttributes()
+            self.calculateModifiedFitAttributes()
 
-        if targetFit:
-            self.calculateModifiedFitAttributes(targetFit=targetFit)
+            if targetFit:
+                self.calculateModifiedFitAttributes(targetFit=targetFit)
 
     def calculateModifiedFitAttributes(self, targetFit=None):
         """
@@ -680,11 +710,6 @@ class Fit(object):
         If a target fit is specified, will project onto the target fit.
         If targetFit is the same as self, then we make a copy in order to properly project it without running into recursion issues.
         """
-
-        if targetFit is None:
-            # do same for command fits as well possibly?
-            for _, value in self.projectedOnto.iteritems():
-                value.victim_fit.calculated = False;
 
         shadow = False
         projectionInfo = None
@@ -699,18 +724,6 @@ class Fit(object):
                 # noinspection PyMethodFirstArgAssignment
                 self = shadow
                 pyfalog.debug("Handling self projection - making shadow copy of fit.")
-
-        """
-        If fit is calculated and we have nothing to do here, get out.
-        A note on why projected fits don't get to return here. If we return
-        here, the projection afflictions will not be run as they are
-        intertwined into the regular fit calculations. So, even if the fit has
-        been calculated, we need to recalculate it again just to apply the
-        projections.
-        """
-        if self.__calculated and not targetFit:
-            pyfalog.debug("Fit has already been calculated and is not projected, returning.")
-            return
 
         for runTime in ("early", "normal", "late"):
             print("Runtime: " + runTime)
@@ -777,7 +790,7 @@ class Fit(object):
 
         if not targetFit:
             # Mark fit as calculated
-            self.__calculated = True
+            self.calculated = True
 
         pyfalog.debug('Done with fit calculation')
 

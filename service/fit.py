@@ -180,7 +180,6 @@ class Fit(object):
 
         fit = self.getFit(fitID, basic=True)
         fit.factorReload = not fit.factorReload
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
 
     def switchFit(self, fitID):
@@ -193,21 +192,15 @@ class Fit(object):
         if fit is None:
             fit = self.getFit(fitID, basic=True)
 
-        projected_fits = len(fit.commandFits) + len(fit.projectedFits)
+        if self.serviceFittingOptions["useGlobalCharacter"]:
+            if fit.character != self.character:
+                fit.character = self.character
 
-        # If the fit  has fits projected on it, always recalc because another fit affecting this one could have changed.
-        if 0 < projected_fits:
-            if self.serviceFittingOptions["useGlobalCharacter"]:
-                if fit.character != self.character:
-                    fit.character = self.character
+        if self.serviceFittingOptions["useGlobalDamagePattern"]:
+            if fit.damagePattern != self.pattern:
+                fit.damagePattern = self.pattern
 
-            if self.serviceFittingOptions["useGlobalDamagePattern"]:
-                if fit.damagePattern != self.pattern:
-                    fit.damagePattern = self.pattern
-
-        if not fit.calculated:
-            eos.db.commit()
-            self.recalc(fit)
+        self.recalc(fit)
 
     def getFit(self, fitID, basic=False):
         """
@@ -357,7 +350,6 @@ class Fit(object):
                 module.state = State.OFFLINE
             fit.projectedModules.append(module)
 
-        eos.db.commit()
         self.recalc(fit)
         return True
 
@@ -377,7 +369,6 @@ class Fit(object):
         eos.db.saveddata_session.flush()
         eos.db.saveddata_session.refresh(thing)
 
-        eos.db.commit()
         self.recalc(fit)
         return True
 
@@ -400,7 +391,6 @@ class Fit(object):
             if projectionInfo:
                 projectionInfo.active = not projectionInfo.active
 
-        eos.db.commit()
         self.recalc(fit)
 
     def toggleCommandFit(self, fitID, thing):
@@ -410,7 +400,6 @@ class Fit(object):
         if commandInfo:
             commandInfo.active = not commandInfo.active
 
-        eos.db.commit()
         self.recalc(fit)
 
     def changeAmount(self, fitID, projected_fit, amount):
@@ -422,7 +411,6 @@ class Fit(object):
         if projectionInfo:
             projectionInfo.amount = amount
 
-        eos.db.commit()
         self.recalc(fit)
 
     def changeActiveFighters(self, fitID, fighter, amount):
@@ -430,7 +418,6 @@ class Fit(object):
         fit = self.getFit(fitID, basic=True)
         fighter.amountActive = amount
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
 
     def removeProjected(self, fitID, thing):
@@ -446,7 +433,6 @@ class Fit(object):
             del fit.__projectedFits[thing.ID]
             # fit.projectedFits.remove(thing)
 
-        eos.db.commit()
         self.recalc(fit)
 
     def removeCommand(self, fitID, thing):
@@ -454,7 +440,6 @@ class Fit(object):
         fit = self.getFit(fitID, basic=True)
         del fit.__commandFits[thing.ID]
 
-        eos.db.commit()
         self.recalc(fit)
 
     def appendModule(self, fitID, itemID):
@@ -586,7 +571,6 @@ class Fit(object):
                 moduleP.amount = 1
                 fit.cargo.insert(cargoIdx, moduleP)
 
-        eos.db.commit()
         self.recalc(fit)
 
     def swapModules(self, fitID, src, dst):
@@ -623,7 +607,6 @@ class Fit(object):
             fit.modules.remove(dstMod)
             fit.modules.insert(dst, new)
 
-            eos.db.commit()
             self.recalc(fit)
 
     def addCargo(self, fitID, itemID, amount=1, replace=False):
@@ -659,7 +642,6 @@ class Fit(object):
             cargo.amount += amount
 
         self.recalc(fit, withBoosters=False)
-        eos.db.commit()
 
         return True
 
@@ -715,7 +697,6 @@ class Fit(object):
                 else:
                     return False
 
-            eos.db.commit()
             self.recalc(fit, withBoosters=False)
             return True
         else:
@@ -727,7 +708,6 @@ class Fit(object):
         f = fit.fighters[i]
         fit.fighters.remove(f)
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -752,7 +732,6 @@ class Fit(object):
                 else:
                     return False
             drone.amount += numDronesToAdd
-            eos.db.commit()
             self.recalc(fit, withBoosters=False)
             return True
         else:
@@ -780,7 +759,6 @@ class Fit(object):
         if d2.amount > d2.amountActive:
             d2.amountActive = d2.amount
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -825,7 +803,6 @@ class Fit(object):
         if d.amount == 0:
             del fit.drones[i]
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -838,7 +815,6 @@ class Fit(object):
         else:
             d.amountActive = d.amount
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -848,7 +824,6 @@ class Fit(object):
         f = fit.fighters[i]
         f.active = not f.active
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -858,7 +833,6 @@ class Fit(object):
         implant = fit.implants[i]
         implant.active = not implant.active
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -867,7 +841,6 @@ class Fit(object):
         fit = self.getFit(fitID, basic=True)
         fit.implantSource = source
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -877,7 +850,6 @@ class Fit(object):
         booster = fit.boosters[i]
         booster.active = not booster.active
 
-        eos.db.commit()
         self.recalc(fit, withBoosters=False)
         return True
 
@@ -885,7 +857,7 @@ class Fit(object):
         pyfalog.debug("Toggling fighter ability for fit ID: {0}", fitID)
         fit = self.getFit(fitID, basic=True)
         ability.active = not ability.active
-        eos.db.commit()
+
         self.recalc(fit, withBoosters=False)
 
     def changeChar(self, fitID, charID):
@@ -933,7 +905,6 @@ class Fit(object):
 
         fit = self.getFit(fitID, basic=True)
         fit.targetResists = pattern
-        eos.db.commit()
 
         self.recalc(fit, withBoosters=False)
 
@@ -952,7 +923,6 @@ class Fit(object):
 
         fit = self.getFit(fitID, basic=True)
         fit.damagePattern = self.pattern = pattern
-        eos.db.commit()
 
         self.recalc(fit, withBoosters=False)
 
@@ -963,7 +933,6 @@ class Fit(object):
 
         fit = self.getFit(fitID, basic=True)
         fit.mode = mode
-        eos.db.commit()
 
         self.recalc(fit)
 
@@ -1026,7 +995,6 @@ class Fit(object):
                         changed = True
 
         if changed:
-            eos.db.commit()
             fit = self.getFit(fitID)
 
             # As some items may affect state-limiting attributes of the ship, calculate new attributes first
@@ -1078,18 +1046,13 @@ class Fit(object):
         else:
             return currState
 
-    def refreshFit(self, fitID):
-        pyfalog.debug("Refresh fit for fit ID: {0}", fitID)
-        if fitID is None:
-            return None
-
-        fit = self.getFit(fitID, basic=True)
-        eos.db.commit()
-        self.recalc(fit)
-
     def recalc(self, fit, withBoosters=True):
         start_time = time()
         pyfalog.info("=" * 10 + "recalc: {0}" + "=" * 10, fit.name)
+
+        # Commit any changes before we recalc
+        eos.db.commit()
+
         if fit.factorReload is not self.serviceFittingOptions["useGlobalForceReload"]:
             fit.factorReload = self.serviceFittingOptions["useGlobalForceReload"]
 
@@ -1103,7 +1066,6 @@ class Fit(object):
                     # Cache the fit to speed up processing later
                     self.getFit(command_fit.ID, basic=True)
 
-        fit.clear()
         # Disabled in 08be50c. Not sure why?
         fit.calculateFitAttributes(withBoosters=withBoosters)
 
