@@ -664,8 +664,13 @@ class Fit(object):
             self.calculateModifiedFitAttributes(targetFit=targetFit)
 
     def calculateModifiedFitAttributes(self, targetFit=None):
-        # Force enable
-        pyfalog.enable()
+        """
+        Calculates a fits atttributes.
+
+        :param targetFit:
+        If a target fit is specified, will project onto the target fit.
+        If targetFit is the same as self, then we make a copy in order to properly project it without running into recursion issues.
+        """
 
         shadow = False
         projectionInfo = None
@@ -673,19 +678,22 @@ class Fit(object):
         if targetFit:
             pyfalog.debug("Applying projections to target: {0}", targetFit.ID)
             projectionInfo = self.getProjectionInfo(targetFit.ID)
-            # noinspection PyNoneFunctionAssignment
             if self is targetFit:
                 # Make a copy of our fit.  targetFit stays as the original, self becomes the copy.
+                # noinspection PyNoneFunctionAssignment
                 shadow = deepcopy(targetFit)
+                # noinspection PyMethodFirstArgAssignment
                 self = shadow
                 pyfalog.debug("Handling self projection - making shadow copy of fit.")
 
-        # If fit is calculated and we have nothing to do here, get out.
-        # A note on why projected fits don't get to return here. If we return
-        # here, the projection afflictions will not be run as they are
-        # intertwined into the regular fit calculations. So, even if the fit has
-        # been calculated, we need to recalculate it again just to apply the
-        # projections.
+        """
+        If fit is calculated and we have nothing to do here, get out.
+        A note on why projected fits don't get to return here. If we return
+        here, the projection afflictions will not be run as they are
+        intertwined into the regular fit calculations. So, even if the fit has
+        been calculated, we need to recalculate it again just to apply the
+        projections.
+        """
         if self.__calculated and not targetFit:
             pyfalog.debug("Fit has already been calculated and is not projected, returning.")
             return
@@ -761,6 +769,7 @@ class Fit(object):
 
         if shadow:
             # Put our original fit back into self
+            # noinspection PyMethodFirstArgAssignment,PyUnusedLocal
             self = targetFit
             # Cleanup after ourselves
             eos.db.remove(shadow)
