@@ -219,20 +219,18 @@ class Fit(object):
         if basic:
             return fit
 
-        inited = getattr(fit, "inited", None)
 
-        # If the fit is not initialized.
-        if (inited is None or inited is False) and fit:
-            self.recalc(fit)
-            fit.fill()
-
-            # Check that the states of all modules are valid
-            self.checkStates(fit, None)
 
             fit.inited = True
 
         if fit:
-            eos.db.commit()
+            # Check that the states of all modules are valid
+            self.checkStates(fit, None)
+            fit.fill()
+
+            if not fit.calculated:
+                self.recalc(fit)
+
             return fit
         else:
             return None
