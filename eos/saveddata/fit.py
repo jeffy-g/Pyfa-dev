@@ -182,6 +182,15 @@ class Fit(object):
         self.__character = char
 
     @property
+    def calculated(self):
+        return self.__calculated
+
+    @calculated.setter
+    def calculated(self, bool):
+        # todo: brief explaination hwo this works
+        self.__calculated = bool
+
+    @property
     def ship(self):
         return self.__ship
 
@@ -671,6 +680,11 @@ class Fit(object):
         If a target fit is specified, will project onto the target fit.
         If targetFit is the same as self, then we make a copy in order to properly project it without running into recursion issues.
         """
+
+        if targetFit is None:
+            # do same for command fits as well possibly?
+            for _, value in self.projectedOnto.iteritems():
+                value.victim_fit.calculated = False;
 
         shadow = False
         projectionInfo = None

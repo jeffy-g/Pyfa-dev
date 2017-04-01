@@ -205,6 +205,7 @@ class Fit(object):
                 if fit.damagePattern != self.pattern:
                     fit.damagePattern = self.pattern
 
+        if not fit.calculated:
             eos.db.commit()
             self.recalc(fit)
 
