@@ -733,7 +733,7 @@ class Fit(object):
 
                     if targetFit:
                         # Apply to projected fit
-                        if item not in chain.from_iterable(r):
+                        if item not in chain.from_iterable(r) and projectionInfo:
                             for _ in xrange(projectionInfo.amount):
                                 targetFit.register(item, origin=self)
                                 item.calculateModifiedAttributes(targetFit, runTime, True)
