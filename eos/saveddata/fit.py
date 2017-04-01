@@ -658,7 +658,7 @@ class Fit(object):
         for command_fit in self.commandFits:
             if command_fit.getCommandInfo(self.ID).active:
                 if command_fit is not self:
-                    command_calculated = command_fit.validateFitCalculated()
+                    command_calculated = command_fit.validateFitChainCalculated()
 
                     if command_calculated is False:
                         return False
