@@ -181,7 +181,7 @@ class Fit(object):
         fit = self.getFit(fitID, basic=True)
         fit.factorReload = not fit.factorReload
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
 
     def switchFit(self, fitID):
         pyfalog.debug("Switching fit to fit ID: {0}", fitID)
@@ -206,7 +206,7 @@ class Fit(object):
                     fit.damagePattern = self.pattern
 
             eos.db.commit()
-            self.recalc(fit, withBoosters=True)
+            self.recalc(fit)
 
     def getFit(self, fitID, basic=False):
         """
@@ -228,7 +228,7 @@ class Fit(object):
 
         # If the fit is not initialized.
         if (inited is None or inited is False) and fit:
-            self.recalc(fit, withBoosters=True)
+            self.recalc(fit)
             fit.fill()
 
             # Check that the states of all modules are valid
@@ -268,7 +268,7 @@ class Fit(object):
 
         fit.implants.append(implant)
         if recalc:
-            self.recalc(fit)
+            self.recalc(fit, withBoosters=False)
         return True
 
     def removeImplant(self, fitID, position):
@@ -279,7 +279,7 @@ class Fit(object):
         fit = self.getFit(fitID)
         implant = fit.implants[position]
         fit.implants.remove(implant)
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def addBooster(self, fitID, itemID):
@@ -296,7 +296,7 @@ class Fit(object):
             return False
 
         fit.boosters.append(booster)
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def removeBooster(self, fitID, position):
@@ -307,7 +307,7 @@ class Fit(object):
         fit = self.getFit(fitID)
         booster = fit.boosters[position]
         fit.boosters.remove(booster)
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def project(self, fitID, thing):
@@ -430,7 +430,7 @@ class Fit(object):
         fighter.amountActive = amount
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
 
     def removeProjected(self, fitID, thing):
         pyfalog.debug("Removing projection on fit ({0}) from: {1}", fitID, thing)
@@ -657,7 +657,7 @@ class Fit(object):
         else:
             cargo.amount += amount
 
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         eos.db.commit()
 
         return True
@@ -670,7 +670,7 @@ class Fit(object):
         fit = self.getFit(fitID)
         charge = fit.cargo[position]
         fit.cargo.remove(charge)
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def addFighter(self, fitID, itemID):
@@ -715,7 +715,7 @@ class Fit(object):
                     return False
 
             eos.db.commit()
-            self.recalc(fit)
+            self.recalc(fit, withBoosters=False)
             return True
         else:
             return False
@@ -727,7 +727,7 @@ class Fit(object):
         fit.fighters.remove(f)
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def addDrone(self, fitID, itemID, numDronesToAdd=1):
@@ -752,7 +752,7 @@ class Fit(object):
                     return False
             drone.amount += numDronesToAdd
             eos.db.commit()
-            self.recalc(fit)
+            self.recalc(fit, withBoosters=False)
             return True
         else:
             return False
@@ -780,7 +780,7 @@ class Fit(object):
             d2.amountActive = d2.amount
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     @staticmethod
@@ -825,7 +825,7 @@ class Fit(object):
             del fit.drones[i]
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def toggleDrone(self, fitID, i):
@@ -838,7 +838,7 @@ class Fit(object):
             d.amountActive = d.amount
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def toggleFighter(self, fitID, i):
@@ -848,7 +848,7 @@ class Fit(object):
         f.active = not f.active
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def toggleImplant(self, fitID, i):
@@ -858,7 +858,7 @@ class Fit(object):
         implant.active = not implant.active
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def toggleImplantSource(self, fitID, source):
@@ -867,7 +867,7 @@ class Fit(object):
         fit.implantSource = source
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def toggleBooster(self, fitID, i):
@@ -877,7 +877,7 @@ class Fit(object):
         booster.active = not booster.active
 
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
         return True
 
     def toggleFighterAbility(self, fitID, ability):
@@ -885,7 +885,7 @@ class Fit(object):
         fit = self.getFit(fitID, basic=True)
         ability.active = not ability.active
         eos.db.commit()
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
 
     def changeChar(self, fitID, charID):
         pyfalog.debug("Changing character ({0}) for fit ID: {1}", charID, fitID)
@@ -934,7 +934,7 @@ class Fit(object):
         fit.targetResists = pattern
         eos.db.commit()
 
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
 
     def getDamagePattern(self, fitID):
         pyfalog.debug("Get damage pattern for fit ID: {0}", fitID)
@@ -953,7 +953,7 @@ class Fit(object):
         fit.damagePattern = self.pattern = pattern
         eos.db.commit()
 
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
 
     def setMode(self, fitID, mode):
         pyfalog.debug("Set mode for fit ID: {0}", fitID)
@@ -982,7 +982,7 @@ class Fit(object):
             setattr(dp, "%sAmount" % attr, ammo.getAttribute("%sDamage" % attr) or 0)
 
         fit.damagePattern = dp
-        self.recalc(fit)
+        self.recalc(fit, withBoosters=False)
 
     def checkStates(self, fit, base):
         pyfalog.debug("Check states for fit ID: {0}", fit)
