@@ -209,10 +209,11 @@ class CommandView(d.Display):
 
     def remove(self, event):
         row, _ = self.HitTest(event.Position)
-        if row != -1:
+        object_to_remove = self.get(row)
+        if row != -1 and object_to_remove:
             col = self.getColumn(event.Position)
             if col != self.getColIndex(State):
                 fitID = self.mainFrame.getActiveFit()
                 sFit = Fit.getInstance()
-                sFit.removeCommand(fitID, self.get(row))
+                sFit.removeCommand(fitID, object_to_remove)
                 wx.PostEvent(self.mainFrame, GE.FitChanged(fitID=fitID))
