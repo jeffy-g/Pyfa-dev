@@ -670,9 +670,7 @@ class Fit(object):
         pyfalog.debug("Starting fit calculation.")
 
         # Follow the chain and clear any
-        if not self.validateFitChainCalculated() or not self.calculated:
-            self.calculated = False
-
+        if not self.validateFitChainCalculated():
             for projected_fit in self.projectedFits:
                 if projected_fit is not self:
                     projected_fit.clear()
@@ -731,6 +729,7 @@ class Fit(object):
 
         if targetFit:
             pyfalog.debug("Applying projections to target: {0}", targetFit.ID)
+            print("Applying projections to target: " + str(targetFit.ID))
             projectionInfo = self.getProjectionInfo(targetFit.ID)
             if self is targetFit:
                 # Make a copy of our fit.  targetFit stays as the original, self becomes the copy.
