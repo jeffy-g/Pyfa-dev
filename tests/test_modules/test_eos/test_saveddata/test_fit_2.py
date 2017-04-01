@@ -1,3 +1,5 @@
+# TODO: Drop the `_2` from the file name once one of our fit files are renamed
+
 # Add root folder to python paths
 # This must be done on every test in order to pass in Travis
 import os
