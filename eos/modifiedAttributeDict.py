@@ -22,7 +22,9 @@ from math import exp
 # TODO: This needs to be moved out, we shouldn't have *ANY* dependencies back to other modules/methods inside eos.
 # This also breaks writing any tests. :(
 from eos.db.gamedata.queries import getAttributeInfo
+from logbook import Logger
 
+pyfalog = Logger(__name__)
 defaultValuesCache = {}
 cappingAttrKeyCache = {}
 
@@ -356,9 +358,13 @@ class ModifiedAttributeDict(collections.MutableMapping):
         if skill:
             boostFactor *= self.__handleSkill(skill)
 
-        if remoteResists:
+        if not self.fit:
+            pyfalog.warning("Missing fit.  Cannot process remote resists for attribute: {0}", attributeName)
+
+        if remoteResists and self.fit:
             # @todo: this is such a disgusting hack. Look into sending these checks to the module class before the
             # effect is applied.
+            # Add checking self.fit as individual modules may not know the fit they're applying to.
             mod = self.fit.getModifier()
             remoteResistID = mod.getModifiedItemAttr("remoteResistanceID") or None
 
