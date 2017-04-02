@@ -858,12 +858,14 @@ class Fit(object):
         self.recalc(fit, withBoosters=False)
 
     def changeChar(self, fitID, charID):
-        pyfalog.debug("Changing character ({0}) for fit ID: {1}", charID, fitID)
-        if fitID is None or charID is None:
-            if charID is not None:
-                self.character = Character.getInstance().all5()
-
+        if fitID is None:
             return
+
+        if charID is None:
+            # Default to the all5 char
+            charID = Character.getInstance().all5().ID
+
+        pyfalog.debug("Changing character ({0}) for fit ID: {1}", charID, fitID)
 
         fit = self.getFit(fitID)
         fit.character = self.character = eos.db.getCharacter(charID)

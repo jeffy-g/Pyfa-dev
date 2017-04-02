@@ -645,39 +645,78 @@ class Fit(object):
         :return:
         True if all fits are calculated, False if one (or more) is not
         """
-        print("Validating: " + str(self.name) + " Status: " + str(self.calculated))
+        # print("Validating: " + str(self.name) + " Status: " + str(self.calculated))
 
         for projected_fit in self.projectedFits:
             if projected_fit.getProjectionInfo(self.ID).active:
                 if projected_fit is not self:
-                    projected_calculated = projected_fit.validateFitChainCalculated()
+                    if projected_fit.calculated is False:
+                        return False
 
+                    projected_calculated = projected_fit.validateFitChainCalculated()
                     if projected_calculated is False:
                         return False
 
         for command_fit in self.commandFits:
             if command_fit.getCommandInfo(self.ID).active:
                 if command_fit is not self:
-                    command_calculated = command_fit.validateFitChainCalculated()
+                    if command_fit.calculated is False:
+                        return False
 
+                    command_calculated = command_fit.validateFitChainCalculated()
                     if command_calculated is False:
                         return False
 
-        print("For (" + str(self.name) + ") returning chain have been calculated")
+        # print("For (" + str(self.name) + ") returning chain have been calculated")
         return True
 
+    def clearFitChainCalculated(self):
+        """
+        Walks up the chain for the fit and clear the calculated flag on any projected or command fits
+
+        :return:
+        True if all fits are calculated, False if one (or more) is not
+        """
+        # print("Clearing calculated flag on: " + str(self.name))
+
+        for projected_fit in self.projectedFits:
+            if projected_fit.getProjectionInfo(self.ID).active:
+                if projected_fit is not self:
+                    projected_fit.clearFitChainCalculated()
+
+        for command_fit in self.commandFits:
+            if command_fit.getCommandInfo(self.ID).active:
+                if command_fit is not self:
+                    command_fit.clearFitChainCalculated()
+
+        self.calculated = False
+
     def calculateFitAttributes(self, targetFit=None, withBoosters=False):
+        """
+        This method handles recursion through the chain of fit, projected fits, and command fits.  We start from our current fit (self), then recurse up through
+        the chain of projected fits.  Because this is self recursive, each level will then recurse further up the chain.  We then do the same for command fits
+        (bursts or formerly gang links).
+
+        In practice if we have Fit B projected onto Fit A, and Fit C projected onto Fit B, it will end up looking like:
+        - Find Fit A, process projected fits
+        - Find Fit B, process projected fits
+        - Find Fit C, no projected fits.
+        - Calculate Fit C
+        - Project Fit C onto Fit B
+        - Calculate Fit B
+        - Project Fit B onto Fit A
+        - Calculate Fit A
+
+        :param targetFit:
+
+        :param withBoosters:
+        :return:
+        """
         pyfalog.debug("Starting fit calculation.")
 
-        # Follow the chain and clear any
+        # Follow the chain, if we find any fits not calculated, recalc them all.
         if not self.validateFitChainCalculated():
-            for projected_fit in self.projectedFits:
-                if projected_fit is not self:
-                    projected_fit.clear()
-
-            for command_fit in self.commandFits:
-                if command_fit is not self:
-                    command_fit.clear()
+            self.clearFitChainCalculated()
 
         if withBoosters:
             # Recalc ships projecting onto this fit
@@ -687,8 +726,7 @@ class Fit(object):
                         # If fit is self, don't recurse
                         self.calculateModifiedFitAttributes(targetFit=self)
                     else:
-                        projected_fit.calculateFitAttributes(withBoosters=withBoosters, targetFit=targetFit)
-                        projected_fit.calculateModifiedFitAttributes(targetFit=self)
+                        projected_fit.calculateFitAttributes(withBoosters=withBoosters, targetFit=self)
 
             for command_fit in self.commandFits:
                 if command_fit.getCommandInfo(self.ID).active:
@@ -696,11 +734,7 @@ class Fit(object):
                         # If fit is self, don't recurse
                         self.calculateModifiedFitAttributes(targetFit=self)
                     else:
-                        command_fit.calculateFitAttributes(withBoosters=withBoosters, targetFit=targetFit)
-                        command_fit.calculateModifiedFitAttributes(targetFit=self)
-        else:
-            pyfalog.debug("All fits in chain have already been calculated.  Skipping recalcs.")
-            print("All fits in chain have already been calculated.  Skipping recalcs.")
+                        command_fit.calculateFitAttributes(withBoosters=withBoosters, targetFit=self)
 
         self.calculateModifiedFitAttributes()
 
@@ -716,18 +750,12 @@ class Fit(object):
         If targetFit is the same as self, then we make a copy in order to properly project it without running into recursion issues.
         """
 
-        print("Calculating fit attributes for: " + str(self.name))
-
-        shadow = False
+        shadow = None
         projectionInfo = None
 
-        if self.calculated and not targetFit:
-            # Fit is already calculated, don't recalc
-            return
-
         if targetFit:
-            pyfalog.debug("Applying projections to target: {0}", targetFit.ID)
-            print("Applying projections to target: " + str(targetFit.ID))
+            pyfalog.debug("Calculating projections from {0} to target {1}", self.name, targetFit.name)
+            print("Calculating projections from " + self.name + " to target " + targetFit.name)
             projectionInfo = self.getProjectionInfo(targetFit.ID)
             if self is targetFit:
                 # Make a copy of our fit.  targetFit stays as the original, self becomes the copy.
@@ -736,12 +764,21 @@ class Fit(object):
                 # noinspection PyMethodFirstArgAssignment
                 self = shadow
                 pyfalog.debug("Handling self projection - making shadow copy of fit.")
+            elif self.calculated and targetFit.calculated:
+                print("Fit calcs already ran.")
+                return
+        else:
+            print("Calculating fit attributes for: " + str(self.name))
+            if self.calculated:
+                # Fit is already calculated, don't recalc
+                print("Fit calcs already ran.")
+                return
 
         for runTime in ("early", "normal", "late"):
             print("Runtime: " + runTime)
-            # Items that are unrestricted. These items are run on the local fit
-            # first and then projected onto the target fit it one is designated
             u = [
+                # Items that are unrestricted. These items are run on the local fit
+                # first and then projected onto the target fit it one is designated
                 (self.character, self.ship),
                 self.drones,
                 self.fighters,
@@ -761,10 +798,6 @@ class Fit(object):
 
             # chain unrestricted and restricted into one iterable
             c = chain.from_iterable(u + r)
-
-            # We calculate gang bonuses first so that projected fits get them
-            # if self.gangBoosts is not None:
-            #     self.__calculateGangBoosts(runTime)
 
             for item in c:
                 # Registering the item about to affect the fit allows us to
@@ -788,13 +821,12 @@ class Fit(object):
                             item.calculateModifiedAttributes(targetFit, runTime, False, True)
                     else:
                         # Apply to local fit
-                        if not self.__calculated:
-                            # apply effects locally if this is first time running them on fit
-                            self.register(item)
-                            item.calculateModifiedAttributes(self, runTime, False)
+                        self.register(item)
+                        item.calculateModifiedAttributes(self, runTime, False)
 
             if self.commandBonuses:
                 if len(self.commandBonuses) > 0:
+                    # Apply command bursts
                     pyfalog.info("Command bonuses applied.")
                     self.__runCommandBoosts(runTime)
 
@@ -804,8 +836,6 @@ class Fit(object):
             # Mark fit as calculated
             self.calculated = True
 
-        pyfalog.debug('Done with fit calculation')
-
         if shadow:
             # Put our original fit back into self
             # noinspection PyMethodFirstArgAssignment,PyUnusedLocal
@@ -813,6 +843,8 @@ class Fit(object):
             # Cleanup after ourselves
             eos.db.remove(shadow)
             del shadow
+
+        pyfalog.debug('Done with fit calculation')
 
     def fill(self):
         """
