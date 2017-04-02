@@ -23,6 +23,7 @@ from itertools import chain
 from math import sqrt, log, asinh
 
 from sqlalchemy.orm import validates, reconstructor
+from sqlalchemy.exc import InvalidRequestError
 
 import eos.db
 from eos import capSim
@@ -841,7 +842,13 @@ class Fit(object):
             # noinspection PyMethodFirstArgAssignment,PyUnusedLocal
             self = targetFit
             # Cleanup after ourselves
-            eos.db.remove(shadow)
+            try:
+                eos.db.remove(shadow)
+            except InvalidRequestError:
+                # Older versions of SQLAlchemy are not forgiving of the delete command. Newer versions seem to use it more as a delete or expunge.
+                # Test a pass here to see if we can just skip it, may need a refresh or other cleanup.
+                print("Caught InvalidRequestError when  deleting the shadow fit out of the database.")
+                pass
             del shadow
 
         pyfalog.debug('Done with fit calculation')

@@ -219,8 +219,6 @@ class Fit(object):
         if basic:
             return fit
 
-            fit.inited = True
-
         if fit:
             # Check that the states of all modules are valid
             self.checkStates(fit, None)
