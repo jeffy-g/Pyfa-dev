@@ -187,20 +187,20 @@ class Fit(object):
         if fitID is None:
             return None
 
-        fit = next((x for x in self.cached_fits if x.ID == fitID), None)
-
-        if fit is None:
-            fit = self.getFit(fitID, basic=True)
+        force_recalc = False
+        fit = self.getFit(fitID)
 
         if self.serviceFittingOptions["useGlobalCharacter"]:
             if fit.character != self.character:
                 fit.character = self.character
+                force_recalc = True
 
         if self.serviceFittingOptions["useGlobalDamagePattern"]:
             if fit.damagePattern != self.pattern:
                 fit.damagePattern = self.pattern
+                force_recalc = True
 
-        if not fit.calculated:
+        if not fit.calculated or force_recalc:
             self.recalc(fit)
 
     def getFit(self, fitID, basic=False):
