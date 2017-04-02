@@ -59,25 +59,25 @@ class Fit(object):
         self.booster = False
 
         serviceFittingDefaultOptions = {
-            "useGlobalCharacter": False,
+            "useGlobalCharacter"    : False,
             "useGlobalDamagePattern": False,
-            "defaultCharacter": self.character.ID,
-            "useGlobalForceReload": False,
-            "colorFitBySlot": False,
-            "rackSlots": True,
-            "rackLabels": True,
-            "compactSkills": True,
-            "showTooltip": True,
-            "showMarketShortcuts": False,
-            "enableGaugeAnimation": True,
-            "exportCharges": True,
-            "openFitInNew": False,
-            "priceSystem": "Jita",
+            "defaultCharacter"      : self.character.ID,
+            "useGlobalForceReload"  : False,
+            "colorFitBySlot"        : False,
+            "rackSlots"             : True,
+            "rackLabels"            : True,
+            "compactSkills"         : True,
+            "showTooltip"           : True,
+            "showMarketShortcuts"   : False,
+            "enableGaugeAnimation"  : True,
+            "exportCharges"         : True,
+            "openFitInNew"          : False,
+            "priceSystem"           : "Jita",
             "showShipBrowserTooltip": True,
         }
 
         self.serviceFittingOptions = SettingsProvider.getInstance().getSettings(
-            "pyfaServiceFittingOptions", serviceFittingDefaultOptions)
+                "pyfaServiceFittingOptions", serviceFittingDefaultOptions)
 
     @staticmethod
     def getAllFits():
@@ -680,10 +680,8 @@ class Fit(object):
                         standardAttackActive = True
                     else:
                         # Activate all other abilities (Neut, Web, etc) except propmods if no standard attack is active
-                        if ability.effect.isImplemented and \
-                                standardAttackActive is False and \
-                                ability.effect.handlerName != u'fighterabilitymicrowarpdrive' and \
-                                ability.effect.handlerName != u'fighterabilityevasivemaneuvers':
+                        if ability.effect.isImplemented and standardAttackActive is False and ability.effect.handlerName != u'fighterabilitymicrowarpdrive' and \
+                                        ability.effect.handlerName != u'fighterabilityevasivemaneuvers':
                             ability.active = True
 
                 if used >= total:
@@ -1004,18 +1002,21 @@ class Fit(object):
     # Old state : New State
     localMap = {
         State.OVERHEATED: State.ACTIVE,
-        State.ACTIVE: State.ONLINE,
-        State.OFFLINE: State.ONLINE,
-        State.ONLINE: State.ACTIVE}
+        State.ACTIVE    : State.ONLINE,
+        State.OFFLINE   : State.ONLINE,
+        State.ONLINE    : State.ACTIVE
+    }
     projectedMap = {
         State.OVERHEATED: State.ACTIVE,
-        State.ACTIVE: State.OFFLINE,
-        State.OFFLINE: State.ACTIVE,
-        State.ONLINE: State.ACTIVE}  # Just in case
+        State.ACTIVE    : State.OFFLINE,
+        State.OFFLINE   : State.ACTIVE,
+        State.ONLINE    : State.ACTIVE
+    }  # Just in case
     # For system effects. They should only ever be online or offline
     projectedSystem = {
         State.OFFLINE: State.ONLINE,
-        State.ONLINE: State.OFFLINE}
+        State.ONLINE : State.OFFLINE
+    }
 
     def __getProposedState(self, mod, click, proposedState=None):
         pyfalog.debug("Get proposed state for module.")
