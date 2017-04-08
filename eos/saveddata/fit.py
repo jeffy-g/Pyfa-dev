@@ -769,7 +769,12 @@ class Fit(object):
                 print("Fit calcs already ran.")
                 return
         else:
-            print("Calculating fit attributes for: " + str(self.name))
+            print("Calculating fit attributes for: %s" % self.name)
+            # or
+            # print("Calculating fit attributes for: " + self.name)  # OK
+            # TODO: 170408 at test code running(occurs when self.name is Japanese
+            # UnicodeEncodeError: 'ascii' codec can't encode characters in position 9-11: ordinal not in range(128)
+            # print("Calculating fit attributes for: " + str(self.name))
             if self.calculated:
                 # Fit is already calculated, don't recalc
                 print("Fit calcs already ran.")
