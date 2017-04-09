@@ -3,8 +3,8 @@
 import os
 import sys
 from time import time
-# script_dir = os.path.dirname(os.path.abspath(__file__))
-# sys.path.append(os.path.realpath(os.path.join(script_dir, '..', '..', '..')))
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.realpath(os.path.join(script_dir, '..', '..', '..')))
 #
 # noinspection PyPackageRequirements
 from _development.helpers import DBInMemory as DB, Gamedata, Saveddata
