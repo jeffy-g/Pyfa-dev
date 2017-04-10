@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+	<fittings>
+		<fitting name="@expensive fit">
+			<description value=""/>
+			<shipType value="&lt;localized hint=&quot;マンティコア&quot;&gt;Manticore*&lt;/localized&gt;"/>
+			<hardware qty="2108" slot="cargo" type="&lt;localized hint=&quot;スコージトルピード&quot;&gt;Scourge Torpedo*&lt;/localized&gt;"/>
+			<hardware slot="med slot 0" type="&lt;localized hint=&quot;パイサムA型 自動調整防御フィールド&quot;&gt;Pithum A-Type Adaptive Invulnerability Field*&lt;/localized&gt;"/>
+			<hardware slot="med slot 3" type="&lt;localized hint=&quot;パイサムA型 自動調整防御フィールド&quot;&gt;Pithum A-Type Adaptive Invulnerability Field*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 3" type="&lt;localized hint=&quot;隠密行動用遮蔽装置II&quot;&gt;Covert Ops Cloaking Device II*&lt;/localized&gt;"/>
+			<hardware slot="low slot 0" type="&lt;localized hint=&quot;共和国海軍仕様弾道制御装置&quot;&gt;Republic Fleet Ballistic Control System*&lt;/localized&gt;"/>
+			<hardware slot="low slot 1" type="&lt;localized hint=&quot;共和国海軍仕様弾道制御装置&quot;&gt;Republic Fleet Ballistic Control System*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 0" type="&lt;localized hint=&quot;共和国海軍仕様トルピードランチャー&quot;&gt;Republic Fleet Torpedo Launcher*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 2" type="&lt;localized hint=&quot;共和国海軍仕様トルピードランチャー&quot;&gt;Republic Fleet Torpedo Launcher*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 4" type="&lt;localized hint=&quot;共和国海軍仕様トルピードランチャー&quot;&gt;Republic Fleet Torpedo Launcher*&lt;/localized&gt;"/>
+			<hardware slot="med slot 1" type="&lt;localized hint=&quot;「インセプション」ターゲットペインター&quot;&gt;'Inception' Target Painter*&lt;/localized&gt;"/>
+			<hardware qty="2120" slot="cargo" type="&lt;localized hint=&quot;カルダリ海軍仕様スコージトルピード&quot;&gt;Caldari Navy Scourge Torpedo*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 0" type="&lt;localized hint=&quot;小型ベイローディングアクセラレーターII&quot;&gt;Small Bay Loading Accelerator II*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 1" type="&lt;localized hint=&quot;小型弾頭リガーカタリストI&quot;&gt;Small Warhead Rigor Catalyst I*&lt;/localized&gt;"/>
+			<hardware slot="med slot 2" type="&lt;localized hint=&quot;共和国海軍仕様中型シールドエクステンダー&quot;&gt;Republic Fleet Medium Shield Extender*&lt;/localized&gt;"/>
+		</fitting>
+		<fitting name="141024 deadevi [low cost]">
+			<description value=""/>
+			<shipType value="&lt;localized hint=&quot;デアデビル&quot;&gt;Deredevil*&lt;/localized&gt;"/>
+			<hardware qty="3298" slot="cargo" type="&lt;localized hint=&quot;プルトニウム弾S&quot;&gt;Plutonium Charge S*&lt;/localized&gt;"/>
+			<hardware qty="2000" slot="cargo" type="&lt;localized hint=&quot;アンチマター弾S&quot;&gt;Antimatter Charge S*&lt;/localized&gt;"/>
+			<hardware slot="med slot 1" type="&lt;localized hint=&quot;1MNアフターバーナーII&quot;&gt;1MN Afterburner II*&lt;/localized&gt;"/>
+			<hardware slot="low slot 0" type="&lt;localized hint=&quot;ダメージ制御II&quot;&gt;Damage Control II*&lt;/localized&gt;"/>
+			<hardware slot="med slot 0" type="&lt;localized hint=&quot;X5持続型ステイシスウェビファイヤー&quot;&gt;X5 Enduring Stasis Webifier*&lt;/localized&gt;"/>
+			<hardware slot="med slot 2" type="&lt;localized hint=&quot;光学式コンパクト追跡コンピューター&quot;&gt;Optical Compact Tracking Computer*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 0" type="&lt;localized hint=&quot;モーダル小型中性子粒子加速器I&quot;&gt;Modal Light Neutron Particle Accelerator I*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 1" type="&lt;localized hint=&quot;モーダル小型中性子粒子加速器I&quot;&gt;Modal Light Neutron Particle Accelerator I*&lt;/localized&gt;"/>
+			<hardware slot="low slot 1" type="&lt;localized hint=&quot;磁場制御機II&quot;&gt;Magnetic Field Stabilizer II*&lt;/localized&gt;"/>
+			<hardware slot="low slot 2" type="&lt;localized hint=&quot;100mm タングステンロール コンパクトプレート&quot;&gt;100mm Rolled Tungsten Compact Plates*&lt;/localized&gt;"/>
+			<hardware qty="2000" slot="cargo" type="&lt;localized hint=&quot;連邦海軍仕様プルトニウム弾S&quot;&gt;Federation Navy Plutonium Charge S*&lt;/localized&gt;"/>
+			<hardware qty="136" slot="cargo" type="&lt;localized hint=&quot;ナノマシンリペアペイスト&quot;&gt;Nanite Repair Paste*&lt;/localized&gt;"/>
+			<hardware qty="1" slot="cargo" type="&lt;localized hint=&quot;最適射程距離スクリプト&quot;&gt;Optimal Range Script*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 2" type="&lt;localized hint=&quot;小型トライマークアーマーポンプI&quot;&gt;Small Trimark Armor Pump I*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 0" type="&lt;localized hint=&quot;小型半導体メモリーセルI&quot;&gt;Small Semiconductor Memory Cell I*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 1" type="&lt;localized hint=&quot;小型ハイブリッドバーストエアレーターI&quot;&gt;Small Hybrid Burst Aerator I*&lt;/localized&gt;"/>
+			<hardware slot="low slot 3" type="&lt;localized hint=&quot;小型補助アーマーリペアラ&quot;&gt;Small Ancillary Armor Repairer*&lt;/localized&gt;"/>
+		</fitting>
+		<fitting name="141230 condorer">
+			<description value=""/>
+			<shipType value="&lt;localized hint=&quot;コンドール&quot;&gt;Condor*&lt;/localized&gt;"/>
+			<hardware qty="3135" slot="cargo" type="&lt;localized hint=&quot;スコージロケット&quot;&gt;Scourge Rocket*&lt;/localized&gt;"/>
+			<hardware slot="med slot 3" type="&lt;localized hint=&quot;小型電子化合キャパシタブースターI&quot;&gt;Small Electrochemical Capacitor Booster I*&lt;/localized&gt;"/>
+			<hardware slot="med slot 1" type="&lt;localized hint=&quot;5MN Y-T8 コンパクトマイクロワープドライブ&quot;&gt;5MN Y-T8 Compact Microwarpdrive*&lt;/localized&gt;"/>
+			<hardware slot="med slot 2" type="&lt;localized hint=&quot;小型C5-L緊急シールドオーバーロードI&quot;&gt;Small C5-L Emergency Shield Overload I*&lt;/localized&gt;"/>
+			<hardware slot="med slot 0" type="&lt;localized hint=&quot;リミテッド適応攻撃耐性フィールドI&quot;&gt;Limited Adaptive Invulnerability Field I*&lt;/localized&gt;"/>
+			<hardware qty="2" slot="cargo" type="&lt;localized hint=&quot;キャップブースター150&quot;&gt;Cap Booster 150*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 0" type="&lt;localized hint=&quot;「アルバレスト」ロケットランチャーI&quot;&gt;'Arbalest' Rocket Launcher I*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 1" type="&lt;localized hint=&quot;「アルバレスト」ロケットランチャーI&quot;&gt;'Arbalest' Rocket Launcher I*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 2" type="&lt;localized hint=&quot;「アルバレスト」ロケットランチャーI&quot;&gt;'Arbalest' Rocket Launcher I*&lt;/localized&gt;"/>
+			<hardware slot="low slot 0" type="&lt;localized hint=&quot;弾道制御装置II&quot;&gt;Ballistic Control System II*&lt;/localized&gt;"/>
+			<hardware slot="low slot 1" type="&lt;localized hint=&quot;弾道制御装置II&quot;&gt;Ballistic Control System II*&lt;/localized&gt;"/>
+			<hardware slot="hi slot 3" type="&lt;localized hint=&quot;民間人仕様サルベージャー&quot;&gt;Civilian Salvager*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 0" type="&lt;localized hint=&quot;小型油圧式ベイスラスターI&quot;&gt;Small Hydraulic Bay Thrusters I*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 1" type="&lt;localized hint=&quot;小型ロケット燃料庫パーティションI&quot;&gt;Small Rocket Fuel Cache Partition I*&lt;/localized&gt;"/>
+			<hardware slot="rig slot 2" type="&lt;localized hint=&quot;小型コア防衛フィールドエクステンダーI&quot;&gt;Small Core Defense Field Extender I*&lt;/localized&gt;"/>
+		</fitting>
+	</fittings>

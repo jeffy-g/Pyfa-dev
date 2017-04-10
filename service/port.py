@@ -122,7 +122,7 @@ def _resolve_ship(fitting, sMkt, b_localized):
             break
 
     if ship is None:
-        raise Exception("cannot resolve ship type.")
+        raise CannotResolveShipException("cannot resolve ship type.")
 
     fitobj = Fit(ship=ship)
     # ------ Confirm fit name
@@ -139,6 +139,12 @@ def _resolve_ship(fitting, sMkt, b_localized):
 
 def _resolve_module(hardware, sMkt, b_localized):
     # type: (xml.dom.minidom.Element, service.market.Market, bool) -> eos.saveddata.module.Module
+    """ For old items that do not exist,
+    It might be a good idea to have a dummy class to be a Place holder.
+    This dummy class does not affect the state of fit at all,
+    It just makes it possible to search for items that will replace the current name from the old name.
+    Otherwise you will not know what was on the ship.
+    """
     moduleName = hardware.getAttribute("type")
     emergency = None
     if b_localized:
@@ -166,6 +172,11 @@ def _resolve_module(hardware, sMkt, b_localized):
 
 class UserCancelException(Exception):
     """when user cancel on port processing."""
+    pass
+
+
+class CannotResolveShipException(Exception):
+    """when ship cannot resolve."""
     pass
 
 
@@ -1052,6 +1063,9 @@ class Port(object):
                 try:
                     item = _resolve_module(hardware, sMkt, b_localized)
                     if not item:
+                        pyfalog.warning(
+                            "Cannot resolve hardware, type={}", hardware.getAttribute("type")
+                        )
                         continue
 
                     if item.category.name == "Drone":
@@ -1242,6 +1256,7 @@ class Port(object):
 
     @staticmethod
     def exportXml(iportuser=None, *fits):
+        # type: (serviece.IPortUser, tuple(eos.saveddata.fit.Fit)) -> basestring
         doc = xml.dom.minidom.Document()
         fittings = doc.createElement("fittings")
         # fit count
@@ -1259,11 +1274,11 @@ class Port(object):
                 # -- 170327 Ignored description --
                 try:
                     notes = fit.notes  # unicode
-                    description.setAttribute(
+                    description.setAttribute(  # TODO: problem of LF character.(for EVE client
                         "value", re.sub("(\r|\n|\r\n)+", "<br>", notes) if notes is not None else ""
                     )
                 except Exception as e:
-                    pyfalog.warning("read description is failed, msg=%s\n" % e.args)
+                    pyfalog.warning("read description is failed, msg=%s\n" % e.message)
 
                 fitting.appendChild(description)
                 shipType = doc.createElement("shipType")
@@ -1394,10 +1409,9 @@ class PortProcessing(object):
         success = True
         try:
             iportuser.on_port_process_start()
-            backedUpFits = Port.exportXml(iportuser, *svcFit.getInstance().getAllFits())
-            backupFile = open(path, "w", encoding="utf-8")
-            backupFile.write(backedUpFits)
-            backupFile.close()
+            xml_source = Port.exportXml(iportuser, *svcFit.getInstance().getAllFits())
+            with open(path, "w", encoding="utf-8") as ostream:
+                ostream.write(xml_source)
         except UserCancelException:
             success = False
         # Send done signal to GUI
@@ -1411,6 +1425,7 @@ class PortProcessing(object):
         iportuser.on_port_process_start()
         success, result = Port.importFitFromFiles(paths, iportuser)
         flag = IPortUser.ID_ERROR if not success else IPortUser.ID_DONE
+        # result is *Fit(success) or string message(!success)
         iportuser.on_port_processing(IPortUser.PROCESS_IMPORT | flag, result)
 
     @staticmethod

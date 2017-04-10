@@ -732,9 +732,10 @@ class MainFrame(wx.Frame, IPortUser):
     def importFromClipboard(self, event):
         clipboard = fromClipboard()
         try:
-            fits = Port().importFitFromBuffer(clipboard, self.getActiveFit())
-        except:
-            pyfalog.error("Attempt to import failed:\n{0}", clipboard)
+            fits = Port.importFitFromBuffer(clipboard, self.getActiveFit())
+        except Exception as ex:  # NOTE: added error message
+            pyfalog.error("Attempt to import failed, message: {0},\nclipboard :\n{1}",
+                          ex.message, clipboard)
         else:
             self._openAfterImport(fits)
 
@@ -798,14 +799,29 @@ class MainFrame(wx.Frame, IPortUser):
             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE
         )
         if dlg.ShowModal() == wx.ID_OK:
+            paths = dlg.GetPaths()
+            if any(map(lambda path: path.endswith(".xml"), paths)):
+                ask = wx.MessageDialog(
+                    self,
+                    """If xml file is exported from EVE,
+It may contain an html tag.
+
+   Do you want to remove them all?
+
+[Yes] to remove it, [No] to capture it as it is""",
+                    caption="Importing fits",
+                    style=wx.YES_NO | wx.ICON_INFORMATION
+                ).ShowModal()
+                # confirm replace tags.
+                Port.set_tag_replace(ask == 5103)
+
             self.progressDialog = wx.ProgressDialog(
                 "Importing fits",
                 " " * 100,  # set some arbitrary spacing to create width in window
                 parent=self,
                 style=wx.PD_CAN_ABORT | wx.PD_SMOOTH | wx.PD_ELAPSED_TIME | wx.PD_APP_MODAL
             )
-            # self.progressDialog.message = None
-            Port.importFitsThreaded(dlg.GetPaths(), self)
+            Port.importFitsThreaded(paths, self)
             self.progressDialog.ShowModal()
             try:
                 dlg.Destroy()
@@ -829,8 +845,7 @@ class MainFrame(wx.Frame, IPortUser):
             if '.' not in os.path.basename(filePath):
                 filePath += ".xml"
 
-            sFit = Fit.getInstance()
-            max_ = sFit.countAllFits()
+            max_ = Fit.getInstance().countAllFits()
 
             self.progressDialog = wx.ProgressDialog(
                 "Backup fits",
@@ -871,7 +886,7 @@ class MainFrame(wx.Frame, IPortUser):
         exportHtml.getInstance().refreshFittingHtml(True, self.backupCallback)
         self.progressDialog.ShowModal()
 
-    def backupCallback(self, info):
+    def backupCallback(self, info):  # for exportHtml
         if info == -1:
             self.closeProgressDialog()
         else:
@@ -880,6 +895,7 @@ class MainFrame(wx.Frame, IPortUser):
     def on_port_process_start(self):
         # flag for progress dialog.
         self.__progress_flag = True
+        # Port.set_tag_replace(False)
 
     def on_port_processing(self, action, data=None):
         # 2017/03/29 NOTE: implementation like interface
@@ -915,19 +931,19 @@ class MainFrame(wx.Frame, IPortUser):
             dlg.ShowModal()
             return
 
-        # data is str
+        # data is str or *Fit
         if action & IPortUser.PROCESS_IMPORT:
             if action & IPortUser.ID_PULSE:
                 _message = ()
             # update message
-            elif action & IPortUser.ID_UPDATE:  # and data != self.progressDialog.message:
+            elif action & IPortUser.ID_UPDATE:
                 _message = data
 
             if _message is not None:
                 self.__progress_flag, _unuse = self.progressDialog.Pulse(_message)
             else:
                 self.closeProgressDialog()
-                if action & IPortUser.ID_DONE:
+                if action & IPortUser.ID_DONE:  # data is *Fit
                     self._openAfterImport(data)
         # data is tuple(int, str)
         elif action & IPortUser.PROCESS_EXPORT:
@@ -946,6 +962,7 @@ class MainFrame(wx.Frame, IPortUser):
                 wx.PostEvent(self.shipBrowser, ImportSelected(fits=fits, back=True))
 
     def closeProgressDialog(self):
+        Port.set_tag_replace(True)
         # Windows apparently handles ProgressDialogs differently. We can
         # simply Destroy it here, but for other platforms we must Close it
         if 'wxMSW' in wx.PlatformInfo:
