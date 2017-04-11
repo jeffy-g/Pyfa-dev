@@ -16,7 +16,7 @@ def caller_name_full(skip=2):
     stack = inspect.stack()
     start = 0 + skip
     if len(stack) < start + 1:
-      return ''
+        return ''
     parentframe = stack[start][0]
 
     name = []
@@ -33,9 +33,9 @@ def caller_name_full(skip=2):
         name.append(parentframe.f_locals['self'].__class__.__name__)
     codename = parentframe.f_code.co_name
     if codename != '<module>':  # top level usually
-        name.append( codename ) # function or a method
+        name.append(codename)  # function or a method
 
-    ## Avoid circular refs and frame leaks
+    # Avoid circular refs and frame leaks
     #  https://docs.python.org/2.7/library/inspect.html#the-interpreter-stack
     del parentframe, stack
 
@@ -47,7 +47,7 @@ def caller_name(skip=2):
     stack = inspect.stack()
     start = 0 + skip
     if len(stack) < start + 1:
-      return ''
+        return ''
     parentframe = stack[start][0]
 
     name = []
@@ -63,8 +63,6 @@ def caller_name(skip=2):
         #      be just a function call
         name.append(parentframe.f_locals['self'].__class__.__name__)
 
-    ## Avoid circular refs and frame leaks
-    #  https://docs.python.org/2.7/library/inspect.html#the-interpreter-stack
     del parentframe, stack
 
     return ".".join(name)

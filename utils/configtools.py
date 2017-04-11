@@ -10,7 +10,7 @@ class RawConfigParserEx(ConfigParser.RawConfigParser):
 
         NOTE:
             Because the definition of RawConfigParser is incorrect,
-            super(class, self) can not be used ... 
+            super(class, self) can not be used ...
     """
     def get(self, option):
         # type: (str) -> str
