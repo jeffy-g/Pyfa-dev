@@ -196,6 +196,7 @@ def _extract_count(xml_file):
 
 """ - - - - - - - - - - - - - - - - - - - - test methods - - - - - - - - - - - - - - - - - - -  """
 
+
 # noinspection PyUnusedLocal
 @pytest.mark.usefixtures('print_db_info')
 @auto_repetition(g_stpw)
@@ -256,6 +257,7 @@ def _error_case(file_name, except_class):
             "failed assertion, It seems that an unexpected exception has occurred"
 
     assert fits is None
+
 
 @auto_repetition(g_stpw)
 def test_02():

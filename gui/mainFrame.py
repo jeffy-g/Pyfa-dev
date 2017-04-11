@@ -763,9 +763,7 @@ class MainFrame(wx.Frame, IPortUser):
         saveDialog = wx.FileDialog(
             self,
             "Export Skills Needed As...",
-            wildcard=("EVEMon skills training file (*.emp)|*.emp|"
-                      "EVEMon skills training XML file (*.xml)|*.xml|"
-                      "Text skills training file (*.txt)|*.txt"),
+            wildcard=gui.g_gui_config.get("export.types.skill"),
             style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
         )
 
@@ -793,27 +791,23 @@ class MainFrame(wx.Frame, IPortUser):
         dlg = wx.FileDialog(
             self,
             "Open One Or More Fitting Files",
-            wildcard=("EVE XML fitting files (*.xml)|*.xml|"
-                      "EFT text fitting files (*.cfg)|*.cfg|"
-                      "All Files (*)|*"),
+            wildcard=gui.g_gui_config.get("import.types.fit"),
             style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE
         )
         if dlg.ShowModal() == wx.ID_OK:
             paths = dlg.GetPaths()
             if any(map(lambda path: path.endswith(".xml"), paths)):
                 ask = wx.MessageDialog(
-                    self,
-                    """If xml file is exported from EVE,
-It may contain an html tag.
-
-   Do you want to remove them all?
-
-[Yes] to remove it, [No] to capture it as it is""",
+                    None,
+                    gui.g_gui_config.get("ask.replace.tag.msg"),
                     caption="Importing fits",
                     style=wx.YES_NO | wx.ICON_INFORMATION
-                ).ShowModal()
+                )
+                ret = ask.ShowModal()
+                ask.Destroy()
                 # confirm replace tags.
-                Port.set_tag_replace(ask == 5103)
+                Port.set_tag_replace(ret == wx.ID_YES)
+                # ask.Destroy()
 
             self.progressDialog = wx.ProgressDialog(
                 "Importing fits",
@@ -923,9 +917,11 @@ It may contain an html tag.
         if action & IPortUser.ID_ERROR:
             self.closeProgressDialog()
             _message = "Import Error" if action & IPortUser.PROCESS_IMPORT else "Export Error"
-            dlg = wx.MessageDialog(self,
-                                   "The following error was generated\n\n%s\n\nBe aware that already processed fits were not saved" % data,
-                                   _message, wx.OK | wx.ICON_ERROR)
+            dlg = wx.MessageDialog(
+                self, gui.g_gui_config.get("port.process.error0") % data,
+                _message,
+                wx.OK | wx.ICON_ERROR
+            )
             # if dlg.ShowModal() == wx.ID_OK:
             #     return
             dlg.ShowModal()
