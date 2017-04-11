@@ -1,5 +1,5 @@
 import ConfigParser
-from inspectors import caller_name
+from utils.inspectors import caller_name
 
 
 class RawConfigParserEx(ConfigParser.RawConfigParser):
