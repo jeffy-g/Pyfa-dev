@@ -196,6 +196,7 @@ def _extract_count(xml_file):
 
 """ - - - - - - - - - - - - - - - - - - - - test methods - - - - - - - - - - - - - - - - - - -  """
 
+
 # noinspection PyUnusedLocal
 @pytest.mark.usefixtures('print_db_info')
 @auto_repetition(g_stpw)
@@ -247,7 +248,7 @@ def _error_case(file_name, except_class):
         src_string = istream.read()
 
     src_string = unicode(src_string, "utf-8")
-    usr.on_port_process_start()
+    mid_usr.on_port_process_start()
     try:
         with g_stpw:
             fits = Port.importXml(src_string, mid_usr)
@@ -256,6 +257,7 @@ def _error_case(file_name, except_class):
             "failed assertion, It seems that an unexpected exception has occurred"
 
     assert fits is None
+
 
 @auto_repetition(g_stpw)
 def test_02():
