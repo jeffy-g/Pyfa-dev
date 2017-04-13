@@ -801,19 +801,23 @@ class MainFrame(wx.Frame, IPortUser):
         if dlg.ShowModal() == wx.ID_OK:
             paths = dlg.GetPaths()
             if any(map(lambda path: path.endswith(".xml"), paths)):
+                # confirm replace tags.
                 ask = wx.MessageDialog(
                     self,
                     """If xml file is exported from EVE,
-It may contain an html tag.
+it may contain an html tag and EVE link tag in description.
 
-   Do you want to remove them all?
+    DO YOU WANT TO REMOVE THEM ALL?
 
-[Yes] to remove it, [No] to capture it as it is""",
+[Yes] to remove it, [No] to capture it as it's
+
+Tip:
+    If you need to import it again into EVE,
+    you may not want to delete it""",
                     caption="Importing fits",
                     style=wx.YES_NO | wx.ICON_INFORMATION
                 ).ShowModal()
-                # confirm replace tags.
-                Port.set_tag_replace(ask == 5103)
+                Port.set_tag_replace(ask == wx.ID_YES)
 
             self.progressDialog = wx.ProgressDialog(
                 "Importing fits",
