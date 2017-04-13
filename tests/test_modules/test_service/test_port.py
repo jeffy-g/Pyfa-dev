@@ -8,14 +8,15 @@ import pytest
 import os
 import sys
 import re
+import xml.parsers.expat
 
 from time import gmtime, strftime
+from functools import wraps
 # from utils.strfunctions import sequential_rep, replace_ltgt
 from utils.stopwatch import Stopwatch
-from functools import wraps
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.realpath(os.path.join(script_dir, '..')))
+sys.path.append(os.path.realpath(os.path.join(script_dir, '..', '..', '..')))
 sys._called_from_test = True  # need db open for tests. (see eos/config.py#17
 # noinspection PyPep8
 from service.port import Port, IPortUser, PortProcessing, CannotResolveShipException
@@ -51,7 +52,7 @@ NOTE of @decorator:
 for local coverage:
     py.test --cov=./ --cov-report=html
     py.test -s --cov=tests --cov-report=html tests
-    py.test -s --collectonly tests
+    py.test --capture=no --collectonly tests
 """
 
 
@@ -113,7 +114,7 @@ class MiddleWeightUser(IPortUser):
                 except AssertionError as ae:
                     print("AssertionError: %s" % ae.message)
                 else:
-                    print("Export done normaly, fit_count=%s, progress(0 to)=%s" % (self.fit_count, self.progress))
+                    print("Export done normaly, fit_count=%s, progress(1 to)=%s" % (self.fit_count, self.progress))
                 return False
             else:
                 self.progress = data[0] + 1
@@ -200,8 +201,8 @@ def _extract_count(xml_file):
 # noinspection PyUnusedLocal
 @pytest.mark.usefixtures('print_db_info')
 @auto_repetition(g_stpw)
-def test_00():
-    """case parse xml"""
+def test_importXML():
+    """construct fit object from xml file"""
     for xml_file in XML_FILES:
         fit_count = _extract_count(xml_file)
         fits = None
@@ -218,8 +219,8 @@ def test_00():
 
 
 @auto_repetition(g_stpw, loop=LOOP_COUNT)
-def test_01():
-    """case import from file (commit to db"""
+def test_importFitsFromFile():
+    """construct fit object from xml file(commit to db"""
     # NOTE: @decorator is to be slow?
     # However, it's appreciated that the code will be succinct
 
@@ -260,23 +261,22 @@ def _error_case(file_name, except_class):
 
 
 @auto_repetition(g_stpw)
-def test_02():
-    """case import bad xml(doesn't exist ship"""
+def test_importXML_BadData():
+    """import bad xml(doesn't exist ship"""
     _error_case(BAD_SHIP_XML, CannotResolveShipException)
 
 
 @auto_repetition(g_stpw)
-def test_03():
-    """case import wrong xml(syntax error"""
-    import xml.parsers.expat
+def test_importXML_WrongFile():
+    """import wrong xml(syntax error"""
     _error_case(WRONG_XML, xml.parsers.expat.ExpatError)
 
 
 # NOTE: auto_repetition decorator affects execution order
 # @auto_repetition(g_stpw, loop=4)
-def test_backup_all():
+def test_backupFits_Repeat():
     """case backup all to xml(write to file"""
-    g_stpw.name = test_backup_all.__doc__
+    g_stpw.name = test_backupFits_Repeat.__doc__
     counter = 6
     g_stpw.reset()
     while counter:
