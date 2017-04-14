@@ -18,6 +18,8 @@ from utils.stopwatch import Stopwatch
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.realpath(os.path.join(script_dir, '..', '..', '..')))
 sys._called_from_test = True  # need db open for tests. (see eos/config.py#17
+
+import eos
 # noinspection PyPep8
 from service.port import Port, IPortUser, PortProcessing, CannotResolveShipException
 from service.fit import Fit
@@ -80,7 +82,7 @@ class MiddleWeightUser(IPortUser):
         _message = None
         if action & IPortUser.ID_ERROR:
             _message =\
-                "The following error was generated\n%s\n\Be aware that already processed fits were not saved" % data
+                "The following error was generated\n  %s\nBe aware that already processed fits were not saved" % data
             print(_message)
             return False
 
@@ -95,8 +97,10 @@ class MiddleWeightUser(IPortUser):
                 assert self.fit_count is len(data)
                 print("---- Succeed import process. ----")
                 if self.__allow_print:
-                    for name in map(lambda fit: fit.name, data):
-                        print("fit name=%s" % name)
+                    for name, string in map(lambda fit: (fit.name, fit.notes), data):
+                        # if string and re.search(r"<[^>]+>", string):
+                        #     string = "!tag in notes"
+                        print("fit name=%s, notes=%s" % (name, string))
                 return False
 
             if _message is not None:  # if (): is evaluated as False
@@ -131,6 +135,15 @@ class MiddleWeightUser(IPortUser):
     def reset(self):
         self.fit_count = 0
         self.progress = 0
+
+    @property
+    def allow_print(self):
+        return self.__allow_print
+
+    @allow_print.setter
+    def allow_print(self, b):
+        self.__allow_print = b
+
 
 
 XML_FILES = (
@@ -179,10 +192,9 @@ def auto_repetition(stpw_, **kwds):
     return _inner
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True) # TODO: py.test bug
 def print_db_info():
     # Output debug info
-    import eos
     print
     print "------------ data base connection info ------------"
     print(eos.db.saveddata_engine)
@@ -199,7 +211,7 @@ def _extract_count(xml_file):
 
 
 # noinspection PyUnusedLocal
-@pytest.mark.usefixtures('print_db_info')
+# @pytest.mark.usefixtures('print_db_info')
 @auto_repetition(g_stpw)
 def test_importXML():
     """construct fit object from xml file"""
@@ -235,12 +247,14 @@ def test_importFitsFromFile():
         The object was created in thread id 6716 and this is thread id 6604.
     """
     # Port.importFitsThreaded((xml_file,), usr2)
+    mid_usr.allow_print = True
     with g_stpw:
         PortProcessing.importFitsFromFile((xml_file,), mid_usr)
     #     counter -= 1
     #
     # # print statistics
     # print "%s\n" % stpw
+    mid_usr.allow_print = False
 
 
 def _error_case(file_name, except_class):
