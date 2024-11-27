@@ -47,7 +47,7 @@ pyfalog = Logger(__name__)
 
 # 2017/04/05 NOTE: simple validation, for xml file
 RE_XML_START = r'<\?xml\s+version="1.0"[^<>]*\?>'
-
+PTN = re.compile(r"&lt;localized hint=&quot;.+&quot;&gt;(.+)\*&lt;/localized&gt;")
 
 class Port:
     """Service which houses all import/export format functions"""
@@ -107,11 +107,11 @@ class Port:
         """
         pyfalog.debug("Starting import fits thread.")
 
-        # def importFitsFromFileWorkerFunc(paths, progress):
-        #     Port.importFitFromFiles(paths, progress)
+        def importFitsFromFileWorkerFunc(paths, progress):
+            Port.importFitFromFiles(paths, progress)
 
         threading.Thread(
-            target=Port.importFitFromFiles,
+            target=importFitsFromFileWorkerFunc,
             args=(paths, progress)
         ).start()
 
@@ -125,6 +125,7 @@ class Port:
         """
 
         sFit = svcFit.getInstance()
+        pyfalog.debug("**************************** dump: {0}, {1}", paths, progress)
 
         fit_list = []
         try:
@@ -226,6 +227,7 @@ class Port:
 
         # If XML-style start of tag encountered, detect as XML
         if re.search(RE_XML_START, firstLine):
+            string = re.sub(PTN, r"\1", string)
             return "XML", True, cls.importXml(string, progress)
 
         # If JSON-style start, parse as CREST/JSON
@@ -234,18 +236,18 @@ class Port:
 
         # If we've got source file name which is used to describe ship name
         # and first line contains something like [setup name], detect as eft config file
-        if re.match("^\s*\[.*]", firstLine) and path is not None:
+        if re.match(r"^\s*\[.*]", firstLine) and path is not None:
             filename = os.path.split(path)[1]
             shipName = filename.rsplit('.')[0]
             return "EFT Config", True, cls.importEftCfg(shipName, lines, progress)
 
         # If no file is specified and there's comma between brackets,
         # consider that we have [ship, setup name] and detect like eft export format
-        if re.match("^\s*\[.*,.*]", firstLine):
+        if re.match(r"^\s*\[.*,.*]", firstLine):
             return "EFT", True, (cls.importEft(lines),)
 
         # Check if string is in DNA format
-        dnaPattern = "\d+(:\d+(;\d+))*::"
+        dnaPattern = r"\d+(:\d+(;\d+))*::"
         if re.match(dnaPattern, firstLine):
             return "DNA", True, (cls.importDna(string),)
         dnaChatPattern = "<url=fitting:(?P<dna>{})>(?P<fitName>[^<>]+)</url>".format(dnaPattern)

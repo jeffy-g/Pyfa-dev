@@ -74,6 +74,7 @@ def _resolve_ship(fitting, sMkt, b_localized):
         try:
             # expect an official name, emergency cache
             shipType, anything = _extract_match(shipType)
+            pyfalog.info('_resolve_ship - shipType:{}, anything:{}', shipType, anything)
         except ExtractingError:
             pass
 
@@ -116,13 +117,14 @@ def _resolve_ship(fitting, sMkt, b_localized):
 
 
 def _resolve_module(hardware, sMkt, b_localized):
-    # type: (xml.dom.minidom.Element, service.market.Market, bool) -> eos.saveddata.module.Module
+    # type: (minidom.Element, Market, bool) -> Module
     moduleName = hardware.getAttribute("base_type") or hardware.getAttribute("type")
     emergency = None
     if b_localized:
         try:
             # expect an official name, emergency cache
             moduleName, emergency = _extract_match(moduleName)
+            pyfalog.info("_resolve_module - moduleName:{}, emergency:{}", moduleName, emergency)
         except ExtractingError:
             pass
 
@@ -135,7 +137,7 @@ def _resolve_module(hardware, sMkt, b_localized):
         except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as e:
-            pyfalog.warning("Caught exception on _resolve_module")
+            pyfalog.warning("Caught exception on _resolve_module, name:{}", moduleName)
             pyfalog.error(e)
             limit -= 1
             if limit == 0:

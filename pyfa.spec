@@ -28,7 +28,7 @@ added_files = [
 icon = 'F:/ext_prg/develp/msys/1.0/home/ht/git/jeffy-g/Pyfa-dev(PyCharm/dist_assets/win/pyfa.ico'
 pathex = []
 upx = True
-debug = False
+debug = True
 
 if os_name == 'Windows':
     added_files.extend([

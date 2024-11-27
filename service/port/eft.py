@@ -46,7 +46,7 @@ pyfalog = Logger(__name__)
 MODULE_CATS = ('Module', 'Subsystem', 'Structure Module')
 SLOT_ORDER = (FittingSlot.LOW, FittingSlot.MED, FittingSlot.HIGH, FittingSlot.RIG, FittingSlot.SUBSYSTEM, FittingSlot.SERVICE)
 OFFLINE_SUFFIX = '/OFFLINE'
-NAME_CHARS = '[^,/\[\]]'  # Characters which are allowed to be used in name
+NAME_CHARS = r'[^,/\[\]]'  # Characters which are allowed to be used in name
 
 
 class MutationExportData:
@@ -247,9 +247,9 @@ def importEft(lines):
     aFit = AbstractFit()
     aFit.mutations = importGetMutationData(lines)
 
-    stubPattern = '^\[.+?\]$'
-    modulePattern = '^(?P<typeName>{0}+?)(,\s*(?P<chargeName>{0}+?))?(?P<offline>\s*{1})?(\s*\[(?P<mutation>\d+?)\])?$'.format(NAME_CHARS, OFFLINE_SUFFIX)
-    droneCargoPattern = '^(?P<typeName>{}+?) x(?P<amount>\d+?)(\s*\[(?P<mutation>\d+?)\])?$'.format(NAME_CHARS)
+    stubPattern = r'^\[.+?\]$'
+    modulePattern = r'^(?P<typeName>{0}+?)(,\s*(?P<chargeName>{0}+?))?(?P<offline>\s*{1})?(\s*\[(?P<mutation>\d+?)\])?$'.format(NAME_CHARS, OFFLINE_SUFFIX)
+    droneCargoPattern = r'^(?P<typeName>{}+?) x(?P<amount>\d+?)(\s*\[(?P<mutation>\d+?)\])?$'.format(NAME_CHARS)
 
     sections = []
     for section in _importSectionIter(lines):
@@ -588,7 +588,7 @@ def _importPrepare(lines):
     return lines
 
 
-mutantHeaderPattern = re.compile('^\[(?P<ref>\d+)\](?P<tail>.*)')
+mutantHeaderPattern = re.compile(r'^\[(?P<ref>\d+)\](?P<tail>.*)')
 
 
 def importGetMutationData(lines):
@@ -649,7 +649,7 @@ def _importCreateFit(lines):
     """Create fit and set top-level entity (ship or citadel)."""
     fit = Fit()
     header = lines.pop(0)
-    m = re.match('\[(?P<shipType>[^,]+),\s*(?P<fitName>.+)\]', header)
+    m = re.match(r'\[(?P<shipType>[^,]+),\s*(?P<fitName>.+)\]', header)
     if not m:
         pyfalog.warning('service.port.eft.importEft: corrupted fit header')
         raise EftImportError
@@ -972,7 +972,7 @@ def lineIter(text):
 def parseAdditions(text, mutaData=None):
     items = []
     sMkt = Market.getInstance()
-    pattern = '^(?P<typeName>{}+?)( x(?P<amount>\d+?))?(\s*\[(?P<mutaref>\d+?)\])?$'.format(NAME_CHARS)
+    pattern = r'^(?P<typeName>{}+?)( x(?P<amount>\d+?))?(\s*\[(?P<mutaref>\d+?)\])?$'.format(NAME_CHARS)
     for line in lineIter(text):
         m = re.match(pattern, line)
         if not m:
@@ -995,7 +995,7 @@ def isValidDroneImport(text):
     lines = list(lineIter(text))
     mutaData = importGetMutationData(lines)
     text = '\n'.join(lines)
-    pattern = 'x\d+(\s*\[\d+\])?$'
+    pattern = r'x\d+(\s*\[\d+\])?$'
     for line in lineIter(text):
         if not re.search(pattern, line):
             return False, ()
@@ -1009,7 +1009,7 @@ def isValidDroneImport(text):
 
 
 def isValidFighterImport(text):
-    pattern = 'x\d+$'
+    pattern = r'x\d+$'
     for line in lineIter(text):
         if not re.search(pattern, line):
             return False, ()
@@ -1023,7 +1023,7 @@ def isValidFighterImport(text):
 
 
 def isValidCargoImport(text):
-    pattern = 'x\d+$'
+    pattern = r'x\d+$'
     for line in lineIter(text):
         if not re.search(pattern, line):
             return False, ()
@@ -1037,7 +1037,7 @@ def isValidCargoImport(text):
 
 
 def isValidImplantImport(text):
-    pattern = 'x\d+$'
+    pattern = r'x\d+$'
     for line in lineIter(text):
         if re.search(pattern, line):
             return False, ()
@@ -1051,7 +1051,7 @@ def isValidImplantImport(text):
 
 
 def isValidBoosterImport(text):
-    pattern = 'x\d+$'
+    pattern = r'x\d+$'
     for line in lineIter(text):
         if re.search(pattern, line):
             return False, ()
