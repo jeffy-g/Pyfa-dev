@@ -281,7 +281,8 @@ def importXml(text, progress):
 
     return fit_list
 
-
+# 2024/11/27 - old max is 400 but currently is 500!
+TEXT_MAX=500
 def exportXml(fits, progress, callback):
     doc = xml.dom.minidom.Document()
     fittings = doc.createElement("fittings")
@@ -312,7 +313,7 @@ def exportXml(fits, progress, callback):
                 notes = fit.notes  # unicode
 
                 if notes:
-                    notes = notes[:397] + '...' if len(notes) > 400 else notes
+                    notes = notes[:TEXT_MAX - 3] + '...' if len(notes) > TEXT_MAX else notes
 
                 description.setAttribute(
                     "value", re.sub("(\r|\n|\r\n)+", "<br>", notes) if notes is not None else ""
