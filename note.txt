@@ -1,6 +1,6 @@
 
 [create executable]
->pyinstaller.exe --clean --noconfirm --upx-dir=.\scripts\upx.exe pyfa.spec
+pyinstaller.exe --clean --noconfirm --upx-dir=.\scripts\upx.exe pyfa.spec
 
 [pyinstaller 以外の選択肢]
 https://trends.codecamp.jp/blogs/media/column24

@@ -5,7 +5,7 @@ import re
 
 
 def sequential_rep(text_, *args):
-    # type: (basestring, tuple) -> basestring
+    # type: (str, tuple) -> str
     """
     :param text_: string content
     :param args: like <pattern>, <replacement>, <pattern>, <replacement>, ...

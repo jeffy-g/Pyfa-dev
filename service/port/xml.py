@@ -313,11 +313,11 @@ def exportXml(fits, progress, callback):
                 notes = fit.notes  # unicode
 
                 if notes:
-                    notes = notes[:TEXT_MAX - 3] + '...' if len(notes) > TEXT_MAX else notes
+                    notes = re.sub(r"(\r|\n|\r\n)", "<br>", notes)
+                    if len(notes) > TEXT_MAX:
+                        notes = notes[:TEXT_MAX - 3] + '...'
 
-                description.setAttribute(
-                    "value", re.sub("(\r|\n|\r\n)+", "<br>", notes) if notes is not None else ""
-                )
+                description.setAttribute("value", notes)
             except (KeyboardInterrupt, SystemExit):
                 raise
             except Exception as e:

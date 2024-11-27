@@ -8,6 +8,16 @@ from gui.utils.numberFormatter import formatAmount
 from service.fit import Fit
 
 
+# timer interval
+LATER = 1000
+TEXT_MAX=500
+# 3
+EXPAND_LF_LEN = len("<br>") - 1
+
+def computeEVEFitNoteSize(note):
+    # type: (str) -> int
+    return len(note) + (note.count("\n") * EXPAND_LF_LEN)
+
 class NotesView(wx.Panel):
 
     def __init__(self, parent):
@@ -25,15 +35,24 @@ class NotesView(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.delayedSave, self.changeTimer)
 
     def OnKeyDown(self, event):
+        nv = self.editNotes
         if event.RawControlDown() and event.GetKeyCode() == wx.WXK_BACK:
             try:
-                HandleCtrlBackspace(self.editNotes)
+                HandleCtrlBackspace(nv)
             except (KeyboardInterrupt, SystemExit):
                 raise
             except:
                 pass
         else:
             event.Skip()
+
+        color = '#000000'
+        if computeEVEFitNoteSize(nv.GetValue()) > TEXT_MAX:
+            color = '#FF0000'
+
+        nv.SetForegroundColour(color)
+        nv.Refresh()
+
 
     def fitChanged(self, event):
         event.Skip()
@@ -63,7 +82,7 @@ class NotesView(wx.Panel):
     def onText(self, event):
         # delay the save so we're not writing to sqlite on every keystroke
         self.changeTimer.Stop()  # cancel the existing timer
-        self.changeTimer.Start(1000, True)
+        self.changeTimer.Start(LATER, True)
 
     def delayedSave(self, event):
         event.Skip()
@@ -82,7 +101,7 @@ class NotesView(wx.Panel):
         opt = sFit.serviceFittingOptions["additionsLabels"]
         # Amount of active implants
         if opt in (1, 2):
-            amount = len(self.editNotes.GetValue())
+            amount = computeEVEFitNoteSize(self.editNotes.GetValue())
             return ' ({})'.format(formatAmount(amount, 2, 0, 3)) if amount else None
         else:
             return None

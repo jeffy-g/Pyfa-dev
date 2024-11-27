@@ -1,0 +1,35 @@
+以下を https://www.online-python.com/ に paste して実行
+-----------------------------------------------------------------
+
+# Online Python - IDE, Editor, Compiler, Interpreter
+text="""oldFitName: Kronos - jove@CassandraTyrannos 2019
+
+[191124@tq] ship name: jv@b-aar
+今日
+
+Autothysian Lancer x4, Cassandra Tyrannos x1
+と対戦、検証済み
+
+OKでしょう
+AF は特に必要ないかと
+
+[参考] Cassandra Tyrannosのspecial hit - 5256
+
+[241126@tq]
+現仕様に合わせて改定
+
+昔は turret point が３つだったのか？
+なので、4つ載せて開いていた mod slot にmod install
+
+先ほど、Autothysian Lancer x2, Cassandra Tyrannos x3
+とstation前でやりあったが、まあ余裕だったかな...
+
+手早く戦えば、上記編成相手に cap booster を使うことはないかな
+手早く戦えば、上記編成相手に cap """
+
+EXPAND_LF_LEN = len("<br>") - 1
+text_size = len(text)
+compute_size = text_size + (text.count("\n") * EXPAND_LF_LEN)
+print(f"""text_size: {text_size}
+compute_size: {compute_size}
+""")
