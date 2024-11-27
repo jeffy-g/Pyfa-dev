@@ -18,6 +18,14 @@ def computeEVEFitNoteSize(note):
     # type: (str) -> int
     return len(note) + (note.count("\n") * EXPAND_LF_LEN)
 
+def updateNoteViewStyle(nv, note=None):
+    # type: (wx.TextCtrl, str) -> None
+    if note is None: note = nv.GetValue()
+    color = '#FF0000' if computeEVEFitNoteSize(note) > TEXT_MAX else '#000000'
+    nv.SetForegroundColour(color)
+    nv.Refresh()
+
+
 class NotesView(wx.Panel):
 
     def __init__(self, parent):
@@ -46,12 +54,7 @@ class NotesView(wx.Panel):
         else:
             event.Skip()
 
-        color = '#000000'
-        if computeEVEFitNoteSize(nv.GetValue()) > TEXT_MAX:
-            color = '#FF0000'
-
-        nv.SetForegroundColour(color)
-        nv.Refresh()
+        updateNoteViewStyle(nv)
 
 
     def fitChanged(self, event):
@@ -76,7 +79,10 @@ class NotesView(wx.Panel):
             return
         elif activeFitID != self.lastFitId:
             self.lastFitId = activeFitID
-            self.editNotes.ChangeValue(fit.notes or "")
+            note = fit.notes or ""
+            nv = self.editNotes
+            nv.ChangeValue(note)
+            updateNoteViewStyle(nv, note)
             wx.PostEvent(self.mainFrame, GE.FitNotesChanged())
 
     def onText(self, event):
