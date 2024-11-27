@@ -1,5 +1,7 @@
 # -*- mode: python -*-
 
+# If you get a cp65001 error during build, set the environment variable PYTHONIOENCODING="utf8"
+
 import os
 from itertools import chain
 import subprocess
@@ -23,7 +25,7 @@ added_files = [
      ('version.yml', '.'),
 ]
 
-icon = None
+icon = 'F:/ext_prg/develp/msys/1.0/home/ht/git/jeffy-g/Pyfa-dev(PyCharm/dist_assets/win/pyfa.ico'
 pathex = []
 upx = True
 debug = False

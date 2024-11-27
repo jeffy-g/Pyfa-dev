@@ -76,6 +76,9 @@ class Port:
         pyfalog.debug("Starting backup fits thread.")
 
         def backupFitsWorkerFunc(path, progress):
+            """
+            :type path: str
+            """
             try:
                 backedUpFits = Port.exportXml(svcFit.getInstance().getAllFits(), progress)
                 if backedUpFits:
@@ -104,11 +107,11 @@ class Port:
         """
         pyfalog.debug("Starting import fits thread.")
 
-        def importFitsFromFileWorkerFunc(paths, progress):
-            Port.importFitFromFiles(paths, progress)
+        # def importFitsFromFileWorkerFunc(paths, progress):
+        #     Port.importFitFromFiles(paths, progress)
 
         threading.Thread(
-            target=importFitsFromFileWorkerFunc,
+            target=Port.importFitFromFiles,
             args=(paths, progress)
         ).start()
 
@@ -231,14 +234,14 @@ class Port:
 
         # If we've got source file name which is used to describe ship name
         # and first line contains something like [setup name], detect as eft config file
-        if re.match("^\s*\[.*\]", firstLine) and path is not None:
+        if re.match("^\s*\[.*]", firstLine) and path is not None:
             filename = os.path.split(path)[1]
             shipName = filename.rsplit('.')[0]
             return "EFT Config", True, cls.importEftCfg(shipName, lines, progress)
 
         # If no file is specified and there's comma between brackets,
         # consider that we have [ship, setup name] and detect like eft export format
-        if re.match("^\s*\[.*,.*\]", firstLine):
+        if re.match("^\s*\[.*,.*]", firstLine):
             return "EFT", True, (cls.importEft(lines),)
 
         # Check if string is in DNA format

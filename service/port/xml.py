@@ -18,7 +18,7 @@
 # =============================================================================
 
 import re
-import xml.dom
+from xml.dom import minidom
 import xml.parsers.expat
 
 from logbook import Logger
@@ -62,7 +62,7 @@ def _extract_match(t):
 
 
 def _resolve_ship(fitting, sMkt, b_localized):
-    # type: (xml.dom.minidom.Element, service.market.Market, bool) -> eos.saveddata.fit.Fit
+    # type: (minidom.Element, Market, bool) -> Fit
     """ NOTE: Since it is meaningless unless a correct ship object can be constructed,
         process flow changed
     """
