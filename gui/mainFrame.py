@@ -250,6 +250,7 @@ class MainFrame(wx.Frame):
 
         self.prevOpenFits = SettingsProvider.getInstance().getSettings("pyfaPrevOpenFits",
                                                                        {"enabled": False, "pyfaOpenFits": []})
+        # type: int[]
         fits = self.prevOpenFits['pyfaOpenFits']
 
         # Remove any fits that cause exception when fetching (non-existent fits)
@@ -363,6 +364,7 @@ class MainFrame(wx.Frame):
         self.statsWnds.remove(wnd)
 
     def getActiveFit(self):
+        # type: () -> int
         p = self.fitMultiSwitch.GetSelectedPage()
         m = getattr(p, "getActiveFit", None)
         return m() if m is not None else None

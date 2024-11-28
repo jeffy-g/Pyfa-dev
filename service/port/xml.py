@@ -40,7 +40,16 @@ from service.port.shared import fetchItem
 from utils.strfunctions import replace_ltgt, sequential_rep
 
 
-pyfalog = Logger(__name__)
+# type: Logger
+threadingLog = None
+def initThreadLogger():
+    threadingLog = Logger(f"{__name__}::thread")
+    # if threadingLog is None:
+    #     threadingLog = Logger(f"{__name__}::thread")
+
+def releaseThreadLogger():
+    threadingLog = None
+
 
 # -- 170327 Ignored description --
 RE_LTGT = "&(lt|gt);"
@@ -74,7 +83,7 @@ def _resolve_ship(fitting, sMkt, b_localized):
         try:
             # expect an official name, emergency cache
             shipType, anything = _extract_match(shipType)
-            pyfalog.info('_resolve_ship - shipType:{}, anything:{}', shipType, anything)
+            threadingLog.info('_resolve_ship - shipType:{}, anything:{}', shipType, anything)
         except ExtractingError:
             pass
 
@@ -90,8 +99,8 @@ def _resolve_ship(fitting, sMkt, b_localized):
         except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as e:
-            pyfalog.warning("Caught exception on _resolve_ship")
-            pyfalog.error(e)
+            threadingLog.warning("Caught exception on _resolve_ship")
+            threadingLog.error(e)
             limit -= 1
             if limit == 0:
                 break
@@ -124,7 +133,7 @@ def _resolve_module(hardware, sMkt, b_localized):
         try:
             # expect an official name, emergency cache
             moduleName, emergency = _extract_match(moduleName)
-            pyfalog.info("_resolve_module - moduleName:{}, emergency:{}", moduleName, emergency)
+            threadingLog.info("_resolve_module - moduleName:{}, emergency:{}", moduleName, emergency)
         except ExtractingError:
             pass
 
@@ -137,8 +146,8 @@ def _resolve_module(hardware, sMkt, b_localized):
         except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as e:
-            pyfalog.warning("Caught exception on _resolve_module, name:{}", moduleName)
-            pyfalog.error(e)
+            threadingLog.warning("Caught exception on _resolve_module, name:{}", moduleName)
+            threadingLog.error(e)
             limit -= 1
             if limit == 0:
                 break
@@ -159,7 +168,9 @@ def _resolve_module(hardware, sMkt, b_localized):
 def importXml(text, progress):
     from .port import Port
     sMkt = Market.getInstance()
-    doc = xml.dom.minidom.parseString(text)
+    doc = minidom.parseString(text)
+    initThreadLogger()
+
     # NOTE:
     #   When L_MARK is included at this point,
     #   Decided to be localized data
@@ -248,7 +259,7 @@ def importXml(text, progress):
                             m = Module(item)
                     # When item can't be added to any slot (unknown item or just charge), ignore it
                     except ValueError:
-                        pyfalog.warning("item can't be added to any slot (unknown item or just charge), ignore it")
+                        threadingLog.warning("item can't be added to any slot (unknown item or just charge), ignore it")
                         continue
                     # Add subsystems before modules to make sure T3 cruisers have subsystems installed
                     if item.category.name == "Subsystem":
@@ -262,7 +273,7 @@ def importXml(text, progress):
                         moduleList.append(m)
 
             except KeyboardInterrupt:
-                pyfalog.warning("Keyboard Interrupt")
+                threadingLog.warning("Keyboard Interrupt")
                 continue
 
         # Recalc to get slot numbers correct for T3 cruisers
@@ -279,12 +290,16 @@ def importXml(text, progress):
         if progress:
             progress.message = "Processing %s\n%s" % (fitobj.ship.name, fitobj.name)
 
+    releaseThreadLogger()
+
     return fit_list
 
 # 2024/11/27 - old max is 400 but currently is 500!
 TEXT_MAX=500
 def exportXml(fits, progress, callback):
-    doc = xml.dom.minidom.Document()
+    # type: (list[Fit], object, any) -> str
+    initThreadLogger()
+    doc = minidom.Document()
     fittings = doc.createElement("fittings")
     # fit count
     fit_count = len(fits)
@@ -321,7 +336,7 @@ def exportXml(fits, progress, callback):
             except (KeyboardInterrupt, SystemExit):
                 raise
             except Exception as e:
-                pyfalog.warning("read description is failed, msg=%s\n" % e.args)
+                threadingLog.warning("read description is failed, msg=%s\n" % e.args)
 
             fitting.appendChild(description)
             shipType = doc.createElement("shipType")
@@ -393,9 +408,10 @@ def exportXml(fits, progress, callback):
         except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as e:
-            pyfalog.error("Failed on fitID: %d, message: %s" % e.message)
+            threadingLog.error("Failed on fitID: %d, message: %s" % e.message)
             continue
     text = doc.toprettyxml()
+    releaseThreadLogger()
 
     if callback:
         callback(text)
