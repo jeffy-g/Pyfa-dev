@@ -103,10 +103,6 @@ class Port:
     def importFitsThreaded(paths, progress):
         # type: (list[str], object) -> None
         pyfalog.debug("Starting import fits thread.")
-
-        # def importFitsFromFileWorkerFunc(paths, progress):
-        #     Port.importFitFromFiles(paths, progress)
-
         threading.Thread(
             target=Port.importFitFromFiles,
             args=(paths, progress)
@@ -128,7 +124,7 @@ class Port:
         try:
             for path in paths:
                 if progress:
-                    if progress and progress.userCancelled:
+                    if progress.userCancelled:
                         progress.workerWorking = False
                         return False, "Cancelled by user"
                     msg = "Processing file:\n%s" % path

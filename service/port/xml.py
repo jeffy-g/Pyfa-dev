@@ -55,9 +55,8 @@ def releaseThreadLogger():
 RE_LTGT = "&(lt|gt);"
 L_MARK = "&lt;localized hint=&quot;"
 # &lt;localized hint=&quot;([^"]+)&quot;&gt;([^\*]+)\*&lt;\/localized&gt;
-LOCALIZED_PATTERN = re.compile(r'<localized hint="([^"]+)">([^\*]+)</localized>')
-
-
+# &lt;localized hint=&quot;クロノス&quot;&gt;Kronos*&lt;/localized&gt;
+LOCALIZED_PATTERN = re.compile(r'<localized hint="([^"]+)">([^\*]+)\*?</localized>')
 class ExtractingError(Exception):
     pass
 
@@ -65,7 +64,7 @@ class ExtractingError(Exception):
 def _extract_match(t):
     # type: (str) -> tuple[str|None, str|None]
     m = LOCALIZED_PATTERN.match(t)
-    # threadingLog.info('_extract_match - match:{}', m)
+    threadingLog.info('_extract_match - match:{}', m)
     if m is None:
         raise ExtractingError
     # threadingLog.info('_extract_match - localized:{}, actualName:{}', m.group(1), m.group(2))
@@ -102,10 +101,8 @@ def _solve_ship(fitting, sMkt, b_localized):
         except (KeyboardInterrupt, SystemExit):
             raise
         except Exception as e:
-            # [2024-11-28 15:02:13.869148] WARNING: service.port.xml-thread: Caught exception on _solve_ship
             # [2024-11-28 15:02:13.869184] ERROR: service.port.xml-thread: 'NoneType' object has no attribute 'category'
-            threadingLog.warning("Caught exception on _solve_ship")
-            threadingLog.error(e)
+            threadingLog.error("Caught exception on _solve_ship -", e)
             limit -= 1
             if limit == 0:
                 break
