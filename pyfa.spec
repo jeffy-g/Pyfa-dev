@@ -25,7 +25,7 @@ added_files = [
      ('version.yml', '.'),
 ]
 
-icon = 'F:/ext_prg/develp/msys/1.0/home/ht/git/jeffy-g/Pyfa-dev(PyCharm/dist_assets/win/pyfa.ico'
+icon = 'dist_assets/win/pyfa.ico'
 pathex = []
 upx = True
 debug = True
