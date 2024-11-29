@@ -8,23 +8,36 @@ from gui.utils.numberFormatter import formatAmount
 from service.fit import Fit
 
 
-# timer interval
 LATER = 1000
+'''timer interval, delay the save'''
+
 TEXT_MAX=500
+'''
+eve fit (xml) "description" limit
+
+Description can contain html tags like <font size="14" color="#ff000000">
+
+If it contains html tags, they will be converted to html entities
+'''
+
 # 3
 EXPAND_LF_LEN = len("<br>") - 1
+'''
+If you save `Fit.notes` to "description" in eve fit(xml export),
+newline characters must be converted to "<br>"
+'''
 
-def computeEVEFitNoteSize(note):
+def computeEVEFitDescSize(note):
     # type: (str) -> int
     return len(note) + (note.count("\n") * EXPAND_LF_LEN)
 
-def updateNoteViewStyle(nv, note=None):
+def ifExceedsTheUpperLimit(nv, note=None):
     # type: (wx.TextCtrl, str) -> None
     '''When the note size exceeds the upper limit, the text will turn red.'''
     if note is None: note = nv.GetValue()
-    color = '#FF0000' if computeEVEFitNoteSize(note) > TEXT_MAX else '#000000'
+    color = '#FF0000' if computeEVEFitDescSize(note) > TEXT_MAX else '#000000'
     nv.SetForegroundColour(color)
-    nv.Refresh()
+    nv.Refresh(False)
 
 
 class NotesView(wx.Panel):
@@ -32,20 +45,19 @@ class NotesView(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         self.lastFitId = None
+        self.changeTimer = wx.Timer(self)
         self.mainFrame = gui.mainFrame.MainFrame.getInstance()
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
         self.editNotes = wx.TextCtrl(self, style=wx.TE_MULTILINE | wx.BORDER_NONE)
+        self.Bind(wx.EVT_TEXT, self.onText)
+        self.Bind(wx.EVT_TIMER, self.delayedSave, self.changeTimer)
+        self.mainFrame.Bind(GE.FIT_CHANGED, self.fitChanged)
+        self.editNotes.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
         mainSizer.Add(self.editNotes, 1, wx.EXPAND | wx.ALL, 10)
         self.SetSizer(mainSizer)
-        self.mainFrame.Bind(GE.FIT_CHANGED, self.fitChanged)
-        self.Bind(wx.EVT_TEXT, self.onText)
-        self.editNotes.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
-        # When the note size exceeds the upper limit, the text will turn red.
-        self.editNotes.Bind(wx.EVT_TEXT, self.onTextEvent)
-        self.changeTimer = wx.Timer(self)
-        self.Bind(wx.EVT_TIMER, self.delayedSave, self.changeTimer)
 
     def OnKeyDown(self, event):
+        # type: (wx.KeyEvent) -> None
         nv = self.editNotes
         if event.RawControlDown() and event.GetKeyCode() == wx.WXK_BACK:
             try:
@@ -57,12 +69,14 @@ class NotesView(wx.Panel):
         else:
             event.Skip()
 
-        updateNoteViewStyle(nv)
+        ifExceedsTheUpperLimit(nv)
 
-    def onTextEvent(self, e):
-        updateNoteViewStyle(self.editNotes)
+    # def onTextEvent(self, e): # Flickering...
+    #     # type: (wx.TextUrlEvent) -> None
+    #     updateNoteViewStyle(self.editNotes)
 
     def fitChanged(self, event):
+        # type: (wx.Event) -> None
         event.Skip()
         activeFitID = self.mainFrame.getActiveFit()
         if activeFitID is not None and activeFitID not in event.fitIDs:
@@ -87,21 +101,26 @@ class NotesView(wx.Panel):
             note = fit.notes or ""
             nv = self.editNotes
             nv.ChangeValue(note)
-            updateNoteViewStyle(nv, note)
+            ifExceedsTheUpperLimit(nv, note)
             wx.PostEvent(self.mainFrame, GE.FitNotesChanged())
 
     def onText(self, event):
+        # type: (wx.Event) -> None
         # delay the save so we're not writing to sqlite on every keystroke
         self.changeTimer.Stop()  # cancel the existing timer
         self.changeTimer.Start(LATER, True)
+        # When the note size exceeds the upper limit, the text will turn red.
+        ifExceedsTheUpperLimit(self.editNotes)
 
     def delayedSave(self, event):
+        # type: (wx.Event) -> None
         event.Skip()
         sFit = Fit.getInstance()
         sFit.editNotes(self.lastFitId, self.editNotes.GetValue())
         wx.PostEvent(self.mainFrame, GE.FitNotesChanged())
 
     def getTabExtraText(self):
+        # type: () -> str|None
         fitID = self.mainFrame.getActiveFit()
         if fitID is None:
             return None
@@ -112,7 +131,7 @@ class NotesView(wx.Panel):
         opt = sFit.serviceFittingOptions["additionsLabels"]
         # Amount of active implants
         if opt in (1, 2):
-            amount = computeEVEFitNoteSize(self.editNotes.GetValue())
+            amount = computeEVEFitDescSize(self.editNotes.GetValue())
             return ' ({})'.format(formatAmount(amount, 2, 0, 3)) if amount else None
         else:
             return None
