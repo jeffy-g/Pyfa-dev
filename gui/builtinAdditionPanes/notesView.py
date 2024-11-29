@@ -20,6 +20,7 @@ def computeEVEFitNoteSize(note):
 
 def updateNoteViewStyle(nv, note=None):
     # type: (wx.TextCtrl, str) -> None
+    '''When the note size exceeds the upper limit, the text will turn red.'''
     if note is None: note = nv.GetValue()
     color = '#FF0000' if computeEVEFitNoteSize(note) > TEXT_MAX else '#000000'
     nv.SetForegroundColour(color)
@@ -39,6 +40,8 @@ class NotesView(wx.Panel):
         self.mainFrame.Bind(GE.FIT_CHANGED, self.fitChanged)
         self.Bind(wx.EVT_TEXT, self.onText)
         self.editNotes.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        # When the note size exceeds the upper limit, the text will turn red.
+        self.editNotes.Bind(wx.EVT_TEXT, self.onTextEvent)
         self.changeTimer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.delayedSave, self.changeTimer)
 
@@ -56,6 +59,8 @@ class NotesView(wx.Panel):
 
         updateNoteViewStyle(nv)
 
+    def onTextEvent(self, e):
+        updateNoteViewStyle(self.editNotes)
 
     def fitChanged(self, event):
         event.Skip()

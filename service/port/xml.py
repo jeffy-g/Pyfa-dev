@@ -60,7 +60,6 @@ LOCALIZED_PATTERN = re.compile(r'<localized hint="([^"]+)">([^\*]+)\*?</localize
 class ExtractingError(Exception):
     pass
 
-
 def _extract_match(t):
     # type: (str) -> tuple[str|None, str|None]
     m = LOCALIZED_PATTERN.match(t)
