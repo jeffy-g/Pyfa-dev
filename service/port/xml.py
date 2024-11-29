@@ -214,6 +214,8 @@ def importXml(text, progress):
         fitobj.notes = description
 
         hardwares = fitting.getElementsByTagName("hardware")
+        # Sorting by "slot" attr is cool
+        hardwares.sort(key=lambda e: e.getAttribute("slot"))
         moduleList = []
         for hardware in hardwares:
             try:
