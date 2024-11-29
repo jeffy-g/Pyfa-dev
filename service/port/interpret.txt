@@ -1,0 +1,26 @@
+以下を https://www.online-python.com/ に paste して実行
+-----------------------------------------------------------------
+# Online Python - IDE, Editor, Compiler, Interpreter
+import re
+
+LOCALIZED_PATTERN = re.compile(r'<localized hint="([^"*]+)\*?">([^*]+)\*?</localized>') # maybe exact
+# LOCALIZED_PATTERN = re.compile(r'<localized hint="([^"]+)">([^\*]+)</localized>') # imcomplet regex
+def _extract_match(t):
+    # type: (str) -> tuple[str, str]
+    m = LOCALIZED_PATTERN.match(t)
+    print(m)
+    # threadingLog.info('_extract_match - match:{}', m)
+    if m is None:
+        raise Exception
+    # threadingLog.info('_extract_match - localized:{}, actualName:{}', m.group(1), m.group(2))
+    # hint attribute, text content
+    return m.group(1), m.group(2)
+
+tag0 = '<localized hint="Vargur*">ヴァーガー</localized>'
+tag1 = '<localized hint="クロノス">Kronos*</localized>'
+
+# expect an official name, emergency cache
+hint, text = _extract_match(tag0)
+print(f'_extract_match - hint:{hint}, text:{text}')
+hint, text = _extract_match(tag1)
+print(f'_extract_match - hint:{hint}, text:{text}')

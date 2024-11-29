@@ -56,12 +56,12 @@ RE_LTGT = "&(lt|gt);"
 L_MARK = "&lt;localized hint=&quot;"
 # &lt;localized hint=&quot;([^"]+)&quot;&gt;([^\*]+)\*&lt;\/localized&gt;
 # &lt;localized hint=&quot;クロノス&quot;&gt;Kronos*&lt;/localized&gt;
-LOCALIZED_PATTERN = re.compile(r'<localized hint="([^"]+)">([^\*]+)\*?</localized>')
+LOCALIZED_PATTERN = re.compile(r'<localized hint="([^"*]+)\*?">([^*]+)\*?</localized>')
 class ExtractingError(Exception):
     pass
 
 def _extract_match(t):
-    # type: (str) -> tuple[str|None, str|None]
+    # type: (str) -> tuple[str, str]
     m = LOCALIZED_PATTERN.match(t)
     threadingLog.info('_extract_match - match:{}', m)
     if m is None:
