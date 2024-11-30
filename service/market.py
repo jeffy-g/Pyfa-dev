@@ -184,7 +184,7 @@ class SearchWorkerThread(threading.Thread):
     def _prepareRequestNormal(self, request):
         # Escape regexp-specific symbols, and un-escape whitespaces
         request = re.escape(request)
-        request = re.sub(r'\\(?P<ws>\s+)', '\\g<ws>', request)
+        request = re.sub(r'\\(?P<ws>\s+)', r'\g<ws>', request)
         # Imitate wildcard search
         request = re.sub(r'\\\*', r'\\w*', request)
         request = re.sub(r'\\\?', r'\\w?', request)
@@ -495,7 +495,7 @@ class Market:
 
     @staticmethod
     def getItem(identity, *args, **kwargs):
-        # type: (str|int, list[str], dict[str]) -> types_Item|None
+        # type: (str|int|types_Item, list[str], dict[str]) -> types_Item|None
         """Get item by its ID or name"""
         try:
             if isinstance(identity, types_Item):

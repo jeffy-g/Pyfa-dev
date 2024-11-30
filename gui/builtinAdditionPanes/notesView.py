@@ -71,10 +71,6 @@ class NotesView(wx.Panel):
 
         ifExceedsTheUpperLimit(nv)
 
-    # def onTextEvent(self, e): # Flickering...
-    #     # type: (wx.TextUrlEvent) -> None
-    #     updateNoteViewStyle(self.editNotes)
-
     def fitChanged(self, event):
         # type: (wx.Event) -> None
         event.Skip()

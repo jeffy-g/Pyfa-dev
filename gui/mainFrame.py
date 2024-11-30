@@ -250,7 +250,6 @@ class MainFrame(wx.Frame):
 
         self.prevOpenFits = SettingsProvider.getInstance().getSettings("pyfaPrevOpenFits",
                                                                        {"enabled": False, "pyfaOpenFits": []})
-        # type: int[]
         fits = self.prevOpenFits['pyfaOpenFits']
 
         # Remove any fits that cause exception when fetching (non-existent fits)
@@ -850,7 +849,6 @@ class MainFrame(wx.Frame):
                 # set some arbitrary spacing to create width in window
                 progress = ProgressHelper(message=" " * 100, callback=self._openAfterImport)
                 call = (Port.importFitsThreaded, [dlg.GetPaths(), progress], {})
-                pyfalog.info("*************************************** FIRE importFitsThreaded:\n{0}", call)
                 self.handleProgress(
                     title=_t("Importing fits"),
                     style=wx.PD_CAN_ABORT | wx.PD_SMOOTH | wx.PD_APP_MODAL | wx.PD_AUTO_HIDE,

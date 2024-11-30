@@ -47,7 +47,7 @@ pyfalog = Logger(__name__)
 
 # 2017/04/05 NOTE: simple validation, for xml file
 RE_XML_START = r'<\?xml\s+version="1.0"[^<>]*\?>'
-PTN = re.compile(r"&lt;localized hint=&quot;.+&quot;&gt;(.+)\*?&lt;/localized&gt;")
+
 
 class Port:
     """Service which houses all import/export format functions"""
@@ -74,7 +74,6 @@ class Port:
     @staticmethod
     def backupFits(path, progress):
         # type: (str, object) -> None
-        # gui.utils.ProgressHelper
         pyfalog.debug("Starting backup fits thread.")
 
         def backupFitsWorkerFunc(path, progress):
@@ -102,6 +101,10 @@ class Port:
     @staticmethod
     def importFitsThreaded(paths, progress):
         # type: (list[str], object) -> None
+        """
+        :param paths: fits data file path list.
+        :rtype: None
+        """
         pyfalog.debug("Starting import fits thread.")
         threading.Thread(
             target=Port.importFitFromFiles,
@@ -118,7 +121,6 @@ class Port:
         """
 
         sFit = svcFit.getInstance()
-        pyfalog.debug("**************************** dump: {0}, {1}", paths, progress)
 
         fit_list = []
         try:
@@ -221,7 +223,6 @@ class Port:
 
         # If XML-style start of tag encountered, detect as XML
         if re.search(RE_XML_START, firstLine):
-            # string = re.sub(PTN, r"\1", string)
             return "XML", True, cls.importXml(string, progress)
 
         # If JSON-style start, parse as CREST/JSON

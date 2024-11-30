@@ -419,17 +419,17 @@ def importEftCfg(shipname, lines, progress):
                     continue
 
                 # Parse line into some data we will need
-                misc = re.match("(Drones|Implant|Booster)_(Active|Inactive)=(.+)", line)
-                cargo = re.match("Cargohold=(.+)", line)
+                misc = re.match(r"(Drones|Implant|Booster)_(Active|Inactive)=(.+)", line)
+                cargo = re.match(r"Cargohold=(.+)", line)
                 # 2017/03/27 NOTE: store description from EFT
-                description = re.match("Description=(.+)", line)
+                description = re.match(r"Description=(.+)", line)
 
                 if misc:
                     entityType = misc.group(1)
                     entityState = misc.group(2)
                     entityData = misc.group(3)
                     if entityType == "Drones":
-                        droneData = re.match("(.+),([0-9]+)", entityData)
+                        droneData = re.match(r"(.+),([0-9]+)", entityData)
                         # Get drone name and attempt to detect drone number
                         droneName = droneData.group(1) if droneData else entityData
                         droneAmount = int(droneData.group(2)) if droneData else 1
@@ -495,7 +495,7 @@ def importEftCfg(shipname, lines, progress):
                         fitobj.boosters.append(b)
                 # If we don't have any prefixes, then it's a module
                 elif cargo:
-                    cargoData = re.match("(.+),([0-9]+)", cargo.group(1))
+                    cargoData = re.match(r"(.+),([0-9]+)", cargo.group(1))
                     cargoName = cargoData.group(1) if cargoData else cargo.group(1)
                     cargoAmount = int(cargoData.group(2)) if cargoData else 1
                     # Bail if we can't get item
@@ -514,7 +514,7 @@ def importEftCfg(shipname, lines, progress):
                 elif description:
                     fitobj.notes = description.group(1).replace("|", "\n")
                 else:
-                    withCharge = re.match("(.+),(.+)", line)
+                    withCharge = re.match(r"(.+),(.+)", line)
                     modName = withCharge.group(1) if withCharge else line
                     chargeName = withCharge.group(2) if withCharge else None
                     # If we can't get module item, skip it

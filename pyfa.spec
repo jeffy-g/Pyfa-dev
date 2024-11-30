@@ -25,10 +25,10 @@ added_files = [
      ('version.yml', '.'),
 ]
 
-icon = 'dist_assets/win/pyfa.ico'
+icon = None
 pathex = []
 upx = True
-debug = True
+debug = False
 
 if os_name == 'Windows':
     added_files.extend([
