@@ -6,19 +6,11 @@ import gui.mainFrame
 from gui.utils.helpers_wxPython import HandleCtrlBackspace
 from gui.utils.numberFormatter import formatAmount
 from service.fit import Fit
+from config import EVE_FIT_NOTE_MAX
 
 
 LATER = 1000
 '''timer interval, delay the save'''
-
-TEXT_MAX=500
-'''
-eve fit (xml) "description" limit
-
-Description can contain html tags like <font size="14" color="#ff000000">
-
-If it contains html tags, they will be converted to html entities
-'''
 
 # 3
 EXPAND_LF_LEN = len("<br>") - 1
@@ -35,7 +27,7 @@ def ifExceedsTheUpperLimit(nv, note=None):
     # type: (wx.TextCtrl, str) -> None
     '''When the note size exceeds the upper limit, the text will turn red.'''
     if note is None: note = nv.GetValue()
-    color = '#FF0000' if computeEVEFitDescSize(note) > TEXT_MAX else '#000000'
+    color = '#FF0000' if computeEVEFitDescSize(note) > EVE_FIT_NOTE_MAX else '#000000'
     nv.SetForegroundColour(color)
     nv.Refresh(False)
 

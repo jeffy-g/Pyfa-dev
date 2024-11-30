@@ -38,6 +38,7 @@ from service.market import Market
 from service.port.muta import renderMutantAttrs, parseMutantAttrs
 from service.port.shared import fetchItem
 from utils.strfunctions import replace_ltgt, sequential_rep
+from config import EVE_FIT_NOTE_MAX
 
 
 pyfalog = Logger(__name__)
@@ -286,8 +287,6 @@ def importXml(text, progress):
 
     return fit_list
 
-# 2024/11/27 - old max is 400 but currently is 500!
-TEXT_MAX=500
 def exportXml(fits, progress, callback):
     # type: (list[Fit], object, any) -> str|None
     doc = minidom.Document()
@@ -320,8 +319,8 @@ def exportXml(fits, progress, callback):
 
                 if notes:
                     notes = re.sub(r"(\r|\n|\r\n)", "<br>", notes)
-                    if len(notes) > TEXT_MAX:
-                        notes = notes[:TEXT_MAX - 3] + '...'
+                    if len(notes) > EVE_FIT_NOTE_MAX:
+                        notes = notes[:EVE_FIT_NOTE_MAX - 3] + '...'
 
                 description.setAttribute("value", notes)
             except (KeyboardInterrupt, SystemExit):
